@@ -15,7 +15,10 @@ message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
-add_executable(compiler main.cpp)
+add_executable(compiler src/main.cpp
+        src/lexer/token.h
+        src/lexer/lexer.cpp
+        src/lexer/lexer.h)
 
 # 3. Turn component names into concrete library targets
 llvm_map_components_to_libnames(llvm_libs core support)
