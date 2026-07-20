@@ -18,7 +18,10 @@ add_definitions(${LLVM_DEFINITIONS})
 add_executable(compiler src/main.cpp
         src/lexer/token.h
         src/lexer/lexer.cpp
-        src/lexer/lexer.h)
+        src/lexer/lexer.h
+        src/ast/expr.h
+        src/parser/parser.h
+        src/parser/parser.cpp)
 
 # 3. Turn component names into concrete library targets
 llvm_map_components_to_libnames(llvm_libs core support)
