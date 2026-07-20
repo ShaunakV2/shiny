@@ -52,4 +52,16 @@ struct BinaryExpr : Expr {
         : op(op), left(std::move(left)), right(std::move(right)) {}
 };
 
+struct UnaryExpr : Expr {
+    TokenKind op;
+    std::unique_ptr<Expr> left;
+
+    void print(std::ostream &os) const override {
+        os << "-";
+        left ->print(os);
+    }
+
+    UnaryExpr(TokenKind op, std::unique_ptr<Expr> left): op(op), left(std::move(left)){}
+};
+
 #endif // COMPILER_EXPR_H

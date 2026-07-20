@@ -31,6 +31,7 @@ private:
     std::unique_ptr<Expr> parseExpression();
     std::unique_ptr<Expr> parseTerm();
     std::unique_ptr<Expr> parseFactor();
+    std::unique_ptr<Expr> parseUnary();
 };
 
 #endif //COMPILER_PARSER_H

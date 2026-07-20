@@ -41,10 +41,10 @@ std::unique_ptr<Expr> Parser::parseExpression()  {
 
 }
 std::unique_ptr<Expr> Parser::parseTerm()  {
-    std::unique_ptr<Expr> left = parseFactor();
+    std::unique_ptr<Expr> left = parseUnary();
     while (check(TokenKind::Slash) || check(TokenKind::Star)) {
         const TokenKind op = advance().kind;
-        std::unique_ptr<Expr> right = parseFactor();
+        std::unique_ptr<Expr> right = parseUnary();
         left = std::make_unique<BinaryExpr>(op, std::move(left), std::move(right));
     }
     return left;
@@ -57,7 +57,7 @@ std::unique_ptr<Expr> Parser::parseFactor()  {
     }
     else if (check(TokenKind::LParen)) {
         const Token& tok = advance();
-        auto inner =  parseExpression();
+        auto inner = parseExpression();
         match(TokenKind::RParen);
         return inner;
     }
@@ -67,5 +67,15 @@ std::unique_ptr<Expr> Parser::parseFactor()  {
     }
 
 }
+
+std::unique_ptr<Expr> Parser::parseUnary() {
+    if (check(TokenKind::Minus)) {
+        advance();
+        std::unique_ptr<Expr> operand = parseUnary();
+        return std::make_unique<UnaryExpr>(TokenKind::Minus, std::move(operand));
+    }
+    return parseFactor();
+}
+
 
 

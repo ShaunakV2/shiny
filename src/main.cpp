@@ -23,7 +23,7 @@ static std::string kindToString(TokenKind kind) {
 }
 
 int main() {
-    Lexer lexer("12 + 34 * (5 - 6)");
+    Lexer lexer("-12 + 34 * (5 - 6)");
     Parser parser(lexer.tokenize());
     std::unique_ptr<Expr> tree = parser.parse();
     tree->print(std::cout);
