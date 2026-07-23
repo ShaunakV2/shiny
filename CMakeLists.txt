@@ -24,7 +24,9 @@ add_executable(compiler src/main.cpp
         src/parser/parser.cpp
         src/bytecode/instruction.h
         src/compiler/compiler.h
-        src/compiler/compiler.cpp)
+        src/compiler/compiler.cpp
+        src/vm/vm.h
+        src/vm/vm.cpp)
 
 # 3. Turn component names into concrete library targets
 llvm_map_components_to_libnames(llvm_libs core support)

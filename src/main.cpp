@@ -5,6 +5,7 @@
 #include "lexer/lexer.h"
 #include "lexer/token.h"
 #include "parser/parser.h"
+#include "vm/vm.h"
 
 // Map a TokenKind to a human-readable name (for debugging/printing).
 // You'll want something like this again later for error messages.
@@ -25,7 +26,7 @@ static std::string kindToString(TokenKind kind) {
 }
 
 int main() {
-    Lexer lexer("-12 + 34 * (5 - 6)");
+    Lexer lexer("-(10 + 2) * 3 - (48 / (2 + 2)) + -5 * -2");
     Parser parser(lexer.tokenize());
     std::unique_ptr<Expr> tree = parser.parse();
     tree->print(std::cout);
@@ -40,5 +41,8 @@ int main() {
         std::cout << " ";
     }
     std::cout << "\n";
+    VM vm;
+    int val = vm.run(instructions);
+    std::cout<<val;
     return 0;
 }
