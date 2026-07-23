@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+
+#include "compiler/compiler.h"
 #include "lexer/lexer.h"
 #include "lexer/token.h"
 #include "parser/parser.h"
@@ -28,6 +30,15 @@ int main() {
     std::unique_ptr<Expr> tree = parser.parse();
     tree->print(std::cout);
     std::cout << "\n";
-
+    Compiler compiler;
+    std::vector<Instruction> instructions=  compiler.compile(*tree);
+    for (const auto& in : instructions) {
+        std::cout << instructionKindToString(in.kind);
+        if (in.value.has_value()) {
+            std::cout << "(" << in.value.value() << ")";
+        }
+        std::cout << " ";
+    }
+    std::cout << "\n";
     return 0;
 }
