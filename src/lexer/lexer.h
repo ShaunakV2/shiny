@@ -21,6 +21,7 @@ private:
     char peek() const;
     char advance();
     Token readNumber();
+    Token readIdentifier();
 };
 
 #endif //COMPILER_LEXER_H

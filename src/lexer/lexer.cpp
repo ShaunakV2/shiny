@@ -4,6 +4,8 @@
 
 #include "lexer.h"
 
+#include <iostream>
+
 Lexer::Lexer(std::string source): source_(std::move(source)) {
 }
 
@@ -27,12 +29,28 @@ Token Lexer::readNumber() {
     return Token{TokenKind::Integer, std::stoi(val)};
 }
 
+Token Lexer::readIdentifier() {
+    std::string val;
+    while (std::isalpha(peek()) || std::isdigit(peek())|| peek() == '_') {
+        val+=advance();
+
+    }
+    if (val == "let") {
+        return Token{.kind = TokenKind::Let, .name = val};
+    }
+    return Token{.kind = TokenKind::Identifier, .name = val};
+
+}
+
 std::vector<Token> Lexer::tokenize() {
     std::vector<Token> tokens;
     while (pos_ < source_.size()) {
         char c = peek();
         if (c >= '0' && c<= '9') {
             tokens.push_back(readNumber());
+        }
+        else if (std::isalpha(c) || c == '_') {
+            tokens.push_back(readIdentifier());
         }
         else if (c == '+') {
             tokens.push_back(Token{TokenKind::Plus, std::nullopt});
@@ -56,6 +74,14 @@ std::vector<Token> Lexer::tokenize() {
         }
         else if (c == ')') {
             tokens.push_back(Token{TokenKind::RParen, std::nullopt});
+            advance();
+        }
+        else if (c == '=') {
+            tokens.push_back(Token{.kind = TokenKind::Assign});
+            advance();
+        }
+        else if (c == ';') {
+            tokens.push_back(Token{.kind = TokenKind::Semicolon});
             advance();
         }
         else if (c == ' ') {

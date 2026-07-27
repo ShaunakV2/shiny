@@ -8,23 +8,22 @@
 #include "vm/vm.h"
 
 int main() {
-    Lexer lexer("-(10 + 2) * 3 - (48 / (2 + 2)) + -5 * -2");
-    Parser parser(lexer.tokenize());
-    std::unique_ptr<Expr> tree = parser.parse();
-    tree->print(std::cout);
-    std::cout << "\n";
-    Compiler compiler;
-    std::vector<Instruction> instructions=  compiler.compile(*tree);
-    for (const auto& in : instructions) {
-        std::cout << instructionKindToString(in.kind);
-        if (in.value.has_value()) {
-            std::cout << "(" << in.value.value() << ")";
+    // Lexer test for the new variable-related tokens.
+    // Once readIdentifier + the keyword check + '=' and ';' are implemented,
+    // this input should tokenize to exactly:
+    //   Let Identifier(x) Assign Integer(12) Plus Identifier(y) Semicolon EndOfFile
+    Lexer lexer("let x = 12 + y;");
+    std::vector<Token> tokens = lexer.tokenize();
+    for (const Token& tok : tokens) {
+        std::cout << tokenKindName(tok.kind);
+        if (tok.value.has_value()) {
+            std::cout << "(" << tok.value.value() << ")";
+        }
+        if (!tok.name.empty()) {
+            std::cout << "(" << tok.name << ")";
         }
         std::cout << " ";
     }
     std::cout << "\n";
-    VM vm;
-    int val = vm.run(instructions);
-    std::cout<<val;
     return 0;
 }
