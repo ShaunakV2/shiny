@@ -7,24 +7,6 @@
 #include "parser/parser.h"
 #include "vm/vm.h"
 
-// Map a TokenKind to a human-readable name (for debugging/printing).
-// You'll want something like this again later for error messages.
-static std::string kindToString(TokenKind kind) {
-    switch (kind) {
-        case TokenKind::Integer:   return "Integer";
-        case TokenKind::Plus:      return "Plus";
-        case TokenKind::Minus:     return "Minus";
-        case TokenKind::Star:      return "Star";
-        case TokenKind::Slash:     return "Slash";
-        case TokenKind::LParen:    return "LParen";
-        case TokenKind::RParen:    return "RParen";
-        case TokenKind::EndOfFile: return "EndOfFile";
-        case TokenKind::Unknown:
-            break;
-    }
-    return "Unknown";
-}
-
 int main() {
     Lexer lexer("-(10 + 2) * 3 - (48 / (2 + 2)) + -5 * -2");
     Parser parser(lexer.tokenize());

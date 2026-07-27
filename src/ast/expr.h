@@ -10,16 +10,6 @@
 
 #include "../lexer/token.h"
 
-inline const char* opSymbol(TokenKind op) {
-    switch (op) {
-        case TokenKind::Plus:  return "+";
-        case TokenKind::Minus: return "-";
-        case TokenKind::Star:  return "*";
-        case TokenKind::Slash: return "/";
-        default:               return "?";
-    }
-}
-
 // Base class for all expression nodes.
 struct Expr {
     virtual ~Expr() = default;
@@ -41,7 +31,7 @@ struct BinaryExpr : Expr {
     std::unique_ptr<Expr> left;
     std::unique_ptr<Expr> right;
     void print(std::ostream &os) const override {
-        os<< "(" << opSymbol(op) << " ";
+        os<< "(" << tokenKindSymbol(op) << " ";
         left->print(os);
         os << " ";
         right->print(os);
