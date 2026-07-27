@@ -10,6 +10,7 @@
 #include <vector>
 #include "../lexer/token.h"
 #include "../ast/expr.h"
+#include "../ast/stmt.h"
 
 class Parser {
 public:
@@ -32,6 +33,10 @@ private:
     std::unique_ptr<Expr> parseTerm();
     std::unique_ptr<Expr> parseFactor();
     std::unique_ptr<Expr> parseUnary();
+
+    std::unique_ptr<Stmt> parseStatement();
+    std::unique_ptr<Stmt> parseLetStatement();
+    std::unique_ptr<Stmt> parseExprStatement();
 };
 
 #endif //COMPILER_PARSER_H

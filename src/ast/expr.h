@@ -54,4 +54,10 @@ struct UnaryExpr : Expr {
     UnaryExpr(TokenKind op, std::unique_ptr<Expr> left): op(op), left(std::move(left)){}
 };
 
+struct VariableExpr : Expr {
+    std::string name;
+    explicit VariableExpr(std::string n) : name(std::move(n)) {}
+    void print(std::ostream& os) const override { os << name; }
+};
+
 #endif // COMPILER_EXPR_H
