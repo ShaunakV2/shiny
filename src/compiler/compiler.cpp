@@ -20,6 +20,9 @@ void Compiler::compileStmt(const Stmt &line) {
         Compiler::symbols_[lt->name] = idx;
         Compiler::code_.push_back(Instruction(InstructionKind::Store, idx));
     }
+    else if (auto* exst = dynamic_cast<const ExprStatement*>(&line)) {
+        compileExpr(*exst->value);
+    }
 
 }
 
@@ -46,6 +49,10 @@ void Compiler::compileExpr(const Expr& node) {
     }
     else if (auto* integer_literal = dynamic_cast<const IntegerLiteral*>(&node)){
         Compiler::code_.push_back(Instruction(InstructionKind::Push, integer_literal->value));
+    }
+    else if (auto* variable_expr = dynamic_cast<const VariableExpr*>(&node)) {
+        int var_loc = Compiler::symbols_[variable_expr->name];
+        Compiler::code_.push_back(Instruction(InstructionKind::Load, var_loc));
     }
 }
 

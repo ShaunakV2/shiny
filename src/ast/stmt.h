@@ -29,9 +29,7 @@ struct LetStatement:Stmt {
 struct ExprStatement:Stmt {
     std::unique_ptr<Expr> value;
     void print(std::ostream &os) const override {
-        os << "(";
         value->print(os);
-        os << ")";
     }
     explicit ExprStatement(std::unique_ptr<Expr> v): value(std::move(v)){}
 };
