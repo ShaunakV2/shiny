@@ -17,6 +17,8 @@ enum class InstructionKind {
     Sub,
     Div,
     Neg,
+    Store,
+    Load,
 };
 
 struct Instruction {
@@ -32,6 +34,8 @@ inline std::string instructionKindToString(InstructionKind kind) {
         case InstructionKind::Sub:  return "Sub";
         case InstructionKind::Div:  return "Div";
         case InstructionKind::Neg:  return "Neg";
+        case InstructionKind::Load: return "Load";
+        case InstructionKind::Store: return "Store";
     }
     return "Unknown";
 }
