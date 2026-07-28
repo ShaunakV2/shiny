@@ -4,10 +4,16 @@
 
 #include "parser.h"
 
+#include <iostream>
+
 Parser::Parser(std::vector<Token> tokens) : tokens_(std::move(tokens)){};
 
-std::unique_ptr<Expr> Parser::parse() {
-     return parseExpression();
+std::vector<std::unique_ptr<Stmt>> Parser::parse() {
+    std::vector<std::unique_ptr<Stmt>> statements;
+    while (!check(TokenKind::EndOfFile)) {
+        statements.push_back(parseStatement());
+    }
+    return statements;
 }
 
 const Token& Parser::peek() const {
@@ -28,6 +34,38 @@ bool Parser::match(TokenKind kind) {
         return true;
     }
     return false;
+}
+
+std::unique_ptr<Stmt> Parser::parseLetStatement() {
+    // Consume the 'Let' Token
+    advance();
+    // The next token is the identifier
+    if (!check(TokenKind::Identifier)) return nullptr;
+    const std::string identifier = advance().name;
+    // Consume the Assign
+    if (!check(TokenKind::Assign)) return nullptr;
+    advance();
+    auto initializer =  parseExpression();
+    if (!check(TokenKind::Semicolon)) return nullptr;
+    advance();
+    return std::make_unique<LetStatement>(std::move(initializer), identifier);
+}
+
+std::unique_ptr<Stmt> Parser::parseExprStatement() {
+    auto initializer = parseExpression();
+    if (!check(TokenKind::Semicolon)) return nullptr;
+    advance();
+    return std::make_unique<ExprStatement>(std::move(initializer));
+}
+
+std::unique_ptr<Stmt> Parser::parseStatement() {
+    // If the first token is let we know that the following will be a let Statement
+    if (check(TokenKind::Let)) {
+        return parseLetStatement();
+    }
+    else {
+        return parseExprStatement();
+    }
 }
 
 std::unique_ptr<Expr> Parser::parseExpression()  {
@@ -60,6 +98,10 @@ std::unique_ptr<Expr> Parser::parseFactor()  {
         auto inner = parseExpression();
         match(TokenKind::RParen);
         return inner;
+    }
+    else if (check(TokenKind::Identifier)) {
+        const std::string name = advance().name;
+        return std::make_unique<VariableExpr>(name);
     }
     else {
         // TODO: Error handling for bad expression

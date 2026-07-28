@@ -17,7 +17,7 @@ public:
     explicit Parser(std::vector<Token> tokens);
 
     // Entry point: parse a full expression, expect EndOfFile after.
-    std::unique_ptr<Expr> parse();
+    std::vector<std::unique_ptr<Stmt>> parse();
 
 private:
     std::vector<Token> tokens_;
