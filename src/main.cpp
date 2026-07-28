@@ -18,12 +18,25 @@ int main() {
     //   (let x = 5)
     //   (let y = (* x 2))
     //   (+ y 1)
-    Lexer lexer("let x = 5; let y = x * 2; y + 1;");
+    // Lexer lexer("let x = 5; let y = x * 2; y + 1;");
+    Lexer lexer("let x = 5;");
     Parser parser(lexer.tokenize());
     std::vector<std::unique_ptr<Stmt>> program = parser.parse();
     for (const std::unique_ptr<Stmt>& stmt : program) {
         stmt->print(std::cout);
         std::cout << "\n";
     }
+    Compiler compiler;
+    std::vector<Instruction> instr = compiler.compile(program);   // ← the actual call
+
+    for (const Instruction& in : instr) {
+        std::cout << instructionKindToString(in.kind);
+        if (in.value.has_value()) {
+            std::cout << "(" << in.value.value() << ")";
+        }
+        std::cout << " ";
+    }
+    std::cout << "\n";
+
     return 0;
 }

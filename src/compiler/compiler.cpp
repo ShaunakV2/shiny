@@ -4,9 +4,23 @@
 
 #include "compiler.h"
 
-std::vector<Instruction> Compiler::compile(const Expr &root) {
-    compileExpr(root);
+std::vector<Instruction> Compiler::compile(const std::vector<std::unique_ptr<Stmt>>& statements) {
+    int i =0;
+    while (statements.size() > i) {
+        compileStmt(*statements.at(i));
+        i+=1;
+    }
     return code_;
+}
+
+void Compiler::compileStmt(const Stmt &line) {
+    if (auto* lt = dynamic_cast<const LetStatement*>(&line)) {
+        compileExpr(*lt->value);
+        const int idx = std::ssize(symbols_);
+        Compiler::symbols_[lt->name] = idx;
+        Compiler::code_.push_back(Instruction(InstructionKind::Store, idx));
+    }
+
 }
 
 void Compiler::compileExpr(const Expr& node) {

@@ -13,6 +13,8 @@ public:
     int run(const std::vector<Instruction>& code);
 private:
     std::stack<int> stack_;
+    std::vector<int> slots_;             // slots for variable storage.
+
 
 };
 
