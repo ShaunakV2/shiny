@@ -21,6 +21,12 @@ enum class TokenKind {
     Let,
     Assign,
     Semicolon,
+    EqualEqual,
+    Greater,
+    Less,
+    GreaterEqual,
+    LessEqual,
+    BangEqual,
     Unknown,
 };
 
@@ -40,6 +46,12 @@ inline std::string tokenKindName(TokenKind kind) {
         case TokenKind::Let:        return "Let";
         case TokenKind::Assign:     return "Assign";
         case TokenKind::Semicolon:  return "Semicolon";
+        case TokenKind::EqualEqual: return "EqualEqual";
+        case TokenKind::Greater:    return "Greater";
+        case TokenKind::Less:       return "Less";
+        case TokenKind::GreaterEqual: return "GreaterEqual";
+        case TokenKind::LessEqual:   return "LessEqual";
+        case TokenKind::BangEqual:   return "BangEqual";
         case TokenKind::Unknown:    return "Unknown";
     }
     return "Unknown";
@@ -56,6 +68,12 @@ inline const char* tokenKindSymbol(TokenKind kind) {
         case TokenKind::Semicolon: return ";";
         case TokenKind::LParen:    return "(";
         case TokenKind::RParen:    return ")";
+        case TokenKind::EqualEqual: return "==";
+        case TokenKind::Greater:    return ">";
+        case TokenKind::Less:       return "<";
+        case TokenKind::GreaterEqual: return ">=";
+        case TokenKind::LessEqual:   return "<=";
+        case TokenKind::BangEqual:   return "!=";
         default:                   return "?";
     }
 }
