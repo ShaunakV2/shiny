@@ -19,6 +19,7 @@ private:
     std::size_t pos_ = 0;    // cursor index, starts at 0
 
     char peek() const;
+    char peekAhead() const;
     char advance();
     Token readNumber();
     Token readIdentifier();

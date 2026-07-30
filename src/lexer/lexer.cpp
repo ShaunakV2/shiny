@@ -14,6 +14,11 @@ char Lexer::peek() const {
     return source_[pos_];
 }
 
+char Lexer::peekAhead() const {
+    if (pos_ >= source_.size() + 1) return '\0';
+    return source_[pos_ + 1];
+}
+
 char Lexer::advance() {
     if (pos_ >= source_.size()) return '\0';
     char curr_char = source_[pos_];
@@ -33,7 +38,6 @@ Token Lexer::readIdentifier() {
     std::string val;
     while (std::isalpha(peek()) || std::isdigit(peek())|| peek() == '_') {
         val+=advance();
-
     }
     if (val == "let") {
         return Token{.kind = TokenKind::Let, .name = val};
@@ -41,6 +45,7 @@ Token Lexer::readIdentifier() {
     return Token{.kind = TokenKind::Identifier, .name = val};
 
 }
+
 
 std::vector<Token> Lexer::tokenize() {
     std::vector<Token> tokens;
@@ -76,8 +81,41 @@ std::vector<Token> Lexer::tokenize() {
             tokens.push_back(Token{TokenKind::RParen, std::nullopt});
             advance();
         }
+        else if (c == '>') {
+            if (peekAhead() == '=') {
+                tokens.push_back(Token{.kind = TokenKind::GreaterEqual});
+                advance();
+            }
+            else {
+                tokens.push_back(Token{.kind = TokenKind::Greater});
+            }
+            advance();
+        }
+        else if (c == '<') {
+            if (peekAhead() == '=') {
+                tokens.push_back(Token{.kind = TokenKind::LessEqual});
+                advance();
+            }
+            else {
+                tokens.push_back(Token{.kind = TokenKind::Less});
+            }
+            advance();
+        }
+        else if (c == '!') {
+            if (peekAhead() == '=') {
+                tokens.push_back(Token{.kind = TokenKind::BangEqual});
+                advance();
+            }
+            advance();
+        }
         else if (c == '=') {
-            tokens.push_back(Token{.kind = TokenKind::Assign});
+            if (peekAhead() == '=') {
+                tokens.push_back(Token{.kind = TokenKind::EqualEqual});
+                advance();
+            }
+            else {
+                tokens.push_back(Token{.kind = TokenKind::Assign});
+            }
             advance();
         }
         else if (c == ';') {
