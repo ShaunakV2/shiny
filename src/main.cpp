@@ -36,6 +36,8 @@ int main() {
         std::cout << " ";
     }
     std::cout << "\n";
-
+    VM vm;
+    int value = vm.run(instr);
+    std::cout << value;
     return 0;
 }

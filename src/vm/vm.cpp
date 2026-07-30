@@ -4,6 +4,8 @@
 
 #include "vm.h"
 
+#include <iostream>
+
 int VM::run(const std::vector<Instruction> &code) {
     for (const Instruction& instr : code) {
         if (instr.kind == InstructionKind::Push) {
@@ -41,6 +43,23 @@ int VM::run(const std::vector<Instruction> &code) {
             int left = stack_.top();
             stack_.pop();
             stack_.push(left / right);
+        }
+        else if (instr.kind == InstructionKind::Store) {
+
+            const int val = stack_.top();
+            stack_.pop();
+
+            const int slot = instr.value.value();
+
+            if (slot >= static_cast<int>(slots_.size())) {
+                slots_.resize(slot + 1);
+            }
+            slots_[slot] = val;
+
+        }
+        else if (instr.kind == InstructionKind::Load) {
+            int val = slots_[instr.value.value()];
+            stack_.push(val);
         }
     }
     return stack_.top();

@@ -14,8 +14,6 @@ public:
 private:
     std::stack<int> stack_;
     std::vector<int> slots_;             // slots for variable storage.
-
-
 };
 
 #endif //COMPILER_VM_H
