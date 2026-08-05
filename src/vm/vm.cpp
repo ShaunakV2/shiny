@@ -44,6 +44,48 @@ int VM::run(const std::vector<Instruction> &code) {
             stack_.pop();
             stack_.push(left / right);
         }
+        else if (instr.kind == InstructionKind::Lt) {
+            int right = stack_.top();
+            stack_.pop();
+            int left = stack_.top();
+            stack_.pop();
+            stack_.push(left < right ? 1 : 0);
+        }
+        else if (instr.kind == InstructionKind::Gt) {
+            int right = stack_.top();
+            stack_.pop();
+            int left = stack_.top();
+            stack_.pop();
+            stack_.push(left > right ? 1 : 0);
+        }
+        else if (instr.kind == InstructionKind::Le) {
+            int right = stack_.top();
+            stack_.pop();
+            int left = stack_.top();
+            stack_.pop();
+            stack_.push(left <= right ? 1 : 0);
+        }
+        else if (instr.kind == InstructionKind::Ge) {
+            int right = stack_.top();
+            stack_.pop();
+            int left = stack_.top();
+            stack_.pop();
+            stack_.push(left >= right ? 1 : 0);
+        }
+        else if (instr.kind == InstructionKind::Eq) {
+            int right = stack_.top();
+            stack_.pop();
+            int left = stack_.top();
+            stack_.pop();
+            stack_.push(left == right ? 1 : 0);
+        }
+        else if (instr.kind == InstructionKind::Ne) {
+            int right = stack_.top();
+            stack_.pop();
+            int left = stack_.top();
+            stack_.pop();
+            stack_.push(left != right ? 1 : 0);
+        }
         else if (instr.kind == InstructionKind::Store) {
 
             const int val = stack_.top();

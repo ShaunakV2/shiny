@@ -42,6 +42,24 @@ void Compiler::compileExpr(const Expr& node) {
         else if (bin->op == TokenKind::Star) {
             Compiler::code_.push_back(Instruction(InstructionKind::Mul));
         }
+        else if (bin->op == TokenKind::Less) {
+            Compiler::code_.push_back(Instruction(InstructionKind::Lt));
+        }
+        else if (bin->op == TokenKind::Greater) {
+            Compiler::code_.push_back(Instruction(InstructionKind::Gt));
+        }
+        else if (bin->op == TokenKind::LessEqual) {
+            Compiler::code_.push_back(Instruction(InstructionKind::Le));
+        }
+        else if (bin->op == TokenKind::GreaterEqual) {
+            Compiler::code_.push_back(Instruction(InstructionKind::Ge));
+        }
+        else if (bin->op == TokenKind::EqualEqual) {
+            Compiler::code_.push_back(Instruction(InstructionKind::Eq));
+        }
+        else if (bin->op == TokenKind::BangEqual) {
+            Compiler::code_.push_back(Instruction(InstructionKind::Ne));
+        }
     }
     else if (auto* unary_expr = dynamic_cast<const UnaryExpr*>(&node)) {
         compileExpr(*unary_expr->left);
