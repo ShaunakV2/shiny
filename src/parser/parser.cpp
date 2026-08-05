@@ -45,14 +45,14 @@ std::unique_ptr<Stmt> Parser::parseLetStatement() {
     // Consume the Assign
     if (!check(TokenKind::Assign)) return nullptr;
     advance();
-    auto initializer =  parseExpression();
+    auto initializer =  parseAdditive();
     if (!check(TokenKind::Semicolon)) return nullptr;
     advance();
     return std::make_unique<LetStatement>(std::move(initializer), identifier);
 }
 
 std::unique_ptr<Stmt> Parser::parseExprStatement() {
-    auto initializer = parseExpression();
+    auto initializer = parseAdditive();
     if (!check(TokenKind::Semicolon)) return nullptr;
     advance();
     return std::make_unique<ExprStatement>(std::move(initializer));
@@ -68,7 +68,7 @@ std::unique_ptr<Stmt> Parser::parseStatement() {
     }
 }
 
-std::unique_ptr<Expr> Parser::parseExpression()  {
+std::unique_ptr<Expr> Parser::parseAdditive()  {
     std::unique_ptr<Expr> left = parseTerm();
     while (check(TokenKind::Plus) || check(TokenKind::Minus)) {
         const TokenKind op = advance().kind;
@@ -95,7 +95,7 @@ std::unique_ptr<Expr> Parser::parseFactor()  {
     }
     else if (check(TokenKind::LParen)) {
         const Token& tok = advance();
-        auto inner = parseExpression();
+        auto inner = parseAdditive();
         match(TokenKind::RParen);
         return inner;
     }

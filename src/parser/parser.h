@@ -29,7 +29,7 @@ private:
     bool check(TokenKind kind) const;   // is current token this kind?
     bool match(TokenKind kind);         // if current is `kind`, consume it & return true
 
-    std::unique_ptr<Expr> parseExpression();
+    std::unique_ptr<Expr> parseAdditive();
     std::unique_ptr<Expr> parseTerm();
     std::unique_ptr<Expr> parseFactor();
     std::unique_ptr<Expr> parseUnary();
