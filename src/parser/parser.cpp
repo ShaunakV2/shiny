@@ -45,18 +45,20 @@ std::unique_ptr<Stmt> Parser::parseLetStatement() {
     // Consume the Assign
     if (!check(TokenKind::Assign)) return nullptr;
     advance();
-    auto initializer =  parseAdditive();
+    auto initializer =  parseExpression();
     if (!check(TokenKind::Semicolon)) return nullptr;
     advance();
     return std::make_unique<LetStatement>(std::move(initializer), identifier);
 }
 
 std::unique_ptr<Stmt> Parser::parseExprStatement() {
-    auto initializer = parseAdditive();
+    auto initializer = parseExpression();
     if (!check(TokenKind::Semicolon)) return nullptr;
     advance();
     return std::make_unique<ExprStatement>(std::move(initializer));
 }
+
+
 
 std::unique_ptr<Stmt> Parser::parseStatement() {
     // If the first token is let we know that the following will be a let Statement
@@ -66,6 +68,32 @@ std::unique_ptr<Stmt> Parser::parseStatement() {
     else {
         return parseExprStatement();
     }
+}
+
+std::unique_ptr<Expr> Parser::parseExpression() {
+    return parseEquality();
+}
+
+std::unique_ptr<Expr> Parser::parseEquality() {
+    std::unique_ptr<Expr> left = parseComparison();
+    while (check(TokenKind::BangEqual) || check(TokenKind::EqualEqual)) {
+        const TokenKind op = advance().kind;
+        std::unique_ptr<Expr> right = parseComparison();
+        left = std::make_unique<BinaryExpr>(op, std::move(left), std::move(right));
+    }
+    return left;
+}
+
+std::unique_ptr<Expr> Parser::parseComparison() {
+    std::unique_ptr<Expr> left = parseAdditive();
+    while (check(TokenKind::Less) || check(TokenKind::Greater) ||
+           check(TokenKind::LessEqual) || check(TokenKind::GreaterEqual)) {
+        const TokenKind op = advance().kind;
+        std::unique_ptr<Expr> right = parseAdditive();
+        left = std::make_unique<BinaryExpr>(op, std::move(left), std::move(right));
+    }
+    return left;
+
 }
 
 std::unique_ptr<Expr> Parser::parseAdditive()  {
@@ -95,7 +123,7 @@ std::unique_ptr<Expr> Parser::parseFactor()  {
     }
     else if (check(TokenKind::LParen)) {
         const Token& tok = advance();
-        auto inner = parseAdditive();
+        auto inner = parseExpression();
         match(TokenKind::RParen);
         return inner;
     }

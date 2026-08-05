@@ -9,25 +9,24 @@
 #include "vm/vm.h"
 
 int main() {
-    // Lexer test for multi-character comparison operators.
-    // The "let x = 5;" prefix is the regression check: a single '=' must still be
-    // Assign, NOT EqualEqual.
-    // Expected token stream:
-    //   Let Identifier(x) Assign Integer(5) Semicolon
-    //   Identifier(x) LessEqual Integer(5) EqualEqual Identifier(y) BangEqual
-    //   Integer(3) Greater Integer(1) Less Integer(2) GreaterEqual Integer(4) EndOfFile
-    Lexer lexer("let x = 5; x <= 5 == y != 3 > 1 < 2 >= 4");
-    std::vector<Token> tokens = lexer.tokenize();
-    for (const Token& tok : tokens) {
-        std::cout << tokenKindName(tok.kind);
-        if (tok.value.has_value()) {
-            std::cout << "(" << tok.value.value() << ")";
-        }
-        if (!tok.name.empty()) {
-            std::cout << "(" << tok.name << ")";
-        }
-        std::cout << " ";
+    // Parser test: comparison & equality precedence.
+    // Expected ASTs (one per statement; exact outer parens depend on your
+    // ExprStatement::print):
+    //   (let x = 5)
+    //   (== (< x 10) 1)              ← == is loosest, then <, so: ((x < 10) == 1)
+    //   (< (+ 1 2) (* 3 4))          ← comparison looser than arithmetic
+    //   (!= (> x 3) (<= 2 4))        ← mix of relational + equality
+    Lexer lexer(
+        "let x = 5;"
+        "x < 10 == 1;"
+        "1 + 2 < 3 * 4;"
+        "x > 3 != 2 <= 4;"
+    );
+    Parser parser(lexer.tokenize());
+    std::vector<std::unique_ptr<Stmt>> program = parser.parse();
+    for (const std::unique_ptr<Stmt>& stmt : program) {
+        stmt->print(std::cout);
+        std::cout << "\n";
     }
-    std::cout << "\n";
     return 0;
 }
