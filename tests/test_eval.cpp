@@ -1,0 +1,41 @@
+#include "doctest.h"
+#include "test_helpers.h"
+
+TEST_CASE("integer arithmetic") {
+    CHECK(evaluate("1 + 2 * 3;") == 7);      // precedence: * before +
+    CHECK(evaluate("(1 + 2) * 3;") == 9);    // parentheses override
+    CHECK(evaluate("10 - 4 - 2;") == 4);     // left-associative
+    CHECK(evaluate("8 / 4 / 2;") == 1);      // left-associative
+    CHECK(evaluate("2 + 3 * 4 - 1;") == 13);
+}
+
+TEST_CASE("unary minus") {
+    CHECK(evaluate("-5 + 3;") == -2);
+    CHECK(evaluate("- -5;") == 5);           // double negation
+    CHECK(evaluate("3 * -5;") == -15);       // unary binds tighter than *
+    CHECK(evaluate("-(2 + 3);") == -5);
+}
+
+TEST_CASE("variables") {
+    CHECK(evaluate("let x = 5; x + 1;") == 6);
+    CHECK(evaluate("let x = 5; let y = x * 2; y + 1;") == 11);
+    CHECK(evaluate("let a = 3; let b = 4; a * a + b * b;") == 25);
+}
+
+TEST_CASE("comparisons") {
+    CHECK(evaluate("1 + 2 < 3 * 4;") == 1);  // 3 < 12
+    CHECK(evaluate("3 * 4 < 1 + 2;") == 0);  // 12 < 3
+    CHECK(evaluate("5 >= 5;") == 1);
+    CHECK(evaluate("5 > 5;") == 0);
+    CHECK(evaluate("4 <= 3;") == 0);
+    CHECK(evaluate("2 == 2;") == 1);
+    CHECK(evaluate("2 != 2;") == 0);
+    CHECK(evaluate("1 + 2 == 3;") == 1);     // arithmetic binds tighter than ==
+}
+
+TEST_CASE("comparisons combined with variables") {
+    CHECK(evaluate("let x = 5; x > 3;") == 1);
+    CHECK(evaluate("let x = 5; x == 5;") == 1);
+    CHECK(evaluate("let x = 5; let y = 10; x < y;") == 1);
+    CHECK(evaluate("let x = 5; x < 10 == 1;") == 1);  // (x < 10) == 1  ->  1 == 1
+}
