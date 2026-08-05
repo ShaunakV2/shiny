@@ -32,6 +32,7 @@ enable_testing()
 add_executable(tests
         tests/test_main.cpp
         tests/test_eval.cpp
+        tests/test_control_flow.cpp
 )
 target_link_libraries(tests PRIVATE compiler_core)
 target_include_directories(tests PRIVATE ${CMAKE_SOURCE_DIR}/tests)

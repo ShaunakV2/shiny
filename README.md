@@ -90,8 +90,30 @@ cmake --build build
 ./build/compiler
 ```
 
-The driver (`src/main.cpp`) currently compiles and runs a sample program and
-prints its AST, bytecode, and result.
+The driver (`src/main.cpp`) compiles and runs a sample program and prints its
+result.
+
+## Testing
+
+The core compiler logic is built as a static library (`compiler_core`) that both
+the CLI and the test runner link against. Tests use
+[doctest](https://github.com/doctest/doctest) (vendored as a single header) and
+are written test-first (TDD) — each check drives a source program end-to-end
+(lex → parse → compile → run) and asserts on the result:
+
+```cpp
+CHECK(evaluate("let x = 5; let y = x * 2; y + 1;") == 11);
+CHECK(evaluate("1 + 2 < 3 * 4;") == 1);
+```
+
+Build and run the suite:
+
+```bash
+cmake --build build --target tests
+./build/tests
+# or, via CTest:
+ctest --test-dir build
+```
 
 ## Project structure
 
@@ -103,7 +125,12 @@ src/
 ├── bytecode/    instruction set definition
 ├── compiler/    AST → bytecode, with the symbol table
 ├── vm/          stack-based bytecode interpreter
-└── main.cpp     driver
+└── main.cpp     CLI driver
+tests/
+├── doctest.h    vendored test framework
+├── test_main.cpp    test-runner entry point
+├── test_helpers.h   end-to-end evaluate() helper
+└── test_eval.cpp    behavior tests
 ```
 
 ## Motivation
