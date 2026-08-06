@@ -25,6 +25,7 @@ private:
 
     // --- token cursor helpers ---
     const Token& peek() const;          // current token, no consume
+    const Token& peekNext() const;      // next token, no consume
     const Token& advance();             // return current, then move forward
     bool check(TokenKind kind) const;   // is current token this kind?
     bool match(TokenKind kind);         // if current is `kind`, consume it & return true

@@ -28,7 +28,7 @@ TEST_CASE("parser: let statement") {
 // --- Milestone 7 (control flow): assignment ---
 // SKIPPED until `x = ...` parses. Expected string assumes AssignStatement::print
 // emits "(assign <name> <value>)" — adjust here if you choose a different format.
-TEST_CASE("parser: assignment statement" * doctest::skip()) {
-    CHECK(astToString("x = 10;") == "(assign x 10)");
-    CHECK(astToString("x = x + 4;") == "(assign x (+ x 4))");  // RHS is a full expression
+TEST_CASE("parser: assignment statement") {
+    CHECK(astToString("x = 10;") == "(assign x = 10)");
+    CHECK(astToString("x = x + 4;") == "(assign x = (+ x 4))");  // RHS is a full expression
 }

@@ -20,6 +20,10 @@ const Token& Parser::peek() const {
     return tokens_[pos_];
 }
 
+const Token &Parser::peekNext() const {
+    return tokens_[pos_ + 1];
+}
+
 const Token &Parser::advance() {
     return tokens_[pos_++];
 }
@@ -51,6 +55,17 @@ std::unique_ptr<Stmt> Parser::parseLetStatement() {
     return std::make_unique<LetStatement>(std::move(initializer), identifier);
 }
 
+std::unique_ptr<Stmt> Parser::parseAssignStatement() {
+    // Consume the Identifier and save the name
+    const std::string identifier =advance().name;
+    // Consume the Assign
+    advance();
+    auto initializer = parseExpression();
+    if (!check(TokenKind::Semicolon)) return nullptr;
+    advance();
+    return std::make_unique<AssignStatement>(std::move(initializer), identifier);
+}
+
 std::unique_ptr<Stmt> Parser::parseExprStatement() {
     auto initializer = parseExpression();
     if (!check(TokenKind::Semicolon)) return nullptr;
@@ -63,6 +78,9 @@ std::unique_ptr<Stmt> Parser::parseStatement() {
     // If the first token is let we know that the following will be a let Statement
     if (check(TokenKind::Let)) {
         return parseLetStatement();
+    }
+    else if (check(TokenKind::Identifier) && peekNext().kind == TokenKind::Assign) {
+        return parseAssignStatement();
     }
     else {
         return parseExprStatement();
