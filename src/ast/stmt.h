@@ -60,4 +60,22 @@ struct BlockStatement:Stmt {
     explicit BlockStatement(std::vector<std::unique_ptr<Stmt>> s) : statements(std::move(s)){}
 };
 
+struct IfStatement:Stmt {
+    std::unique_ptr<Expr> condition;
+    std::unique_ptr<Stmt>  thenBranch;
+    std::unique_ptr<Stmt> elseBranch;
+    void print(std::ostream& os) const override {
+        os << "(if ";
+        condition->print(os);
+        os << " ";
+        thenBranch->print(os);
+        if (elseBranch) {
+            os << " ";
+            elseBranch->print(os);
+        }
+        os << ")";
+    }
+    explicit IfStatement(std::unique_ptr<Expr> c, std::unique_ptr<Stmt>  tb, std::unique_ptr<Stmt>  eb): condition(std::move(c)), thenBranch(std::move(tb)), elseBranch(std::move(eb)){}
+};
+
 #endif //COMPILER_STMT_H

@@ -39,3 +39,15 @@ TEST_CASE("parser: block groups statements") {
     CHECK(astToString("{ let x = 1; x; }") == "(block (let x = 1) x)");
     CHECK(astToString("{ }") == "(block)");
 }
+
+// SKIPPED until `if` parses. Expected assumes IfStatement::print emits
+// "(if <cond> <then>)" and "(if <cond> <then> <else>)" — adjust if you differ.
+TEST_CASE("parser: if without else") {
+    CHECK(astToString("if (1 < 2) { x = 1; }") ==
+          "(if (< 1 2) (block (assign x = 1)))");
+}
+
+TEST_CASE("parser: if with else") {
+    CHECK(astToString("if (1 < 2) { x = 1; } else { x = 2; }") ==
+          "(if (< 1 2) (block (assign x = 1)) (block (assign x = 2)))");
+}

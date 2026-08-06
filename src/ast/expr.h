@@ -59,5 +59,4 @@ struct VariableExpr : Expr {
     explicit VariableExpr(std::string n) : name(std::move(n)) {}
     void print(std::ostream& os) const override { os << name; }
 };
-
 #endif // COMPILER_EXPR_H
