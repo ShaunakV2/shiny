@@ -1,21 +1,21 @@
 #include "doctest.h"
-#include "test_helpers.h"
+#include "helpers.h"
+
+using namespace test;
 
 // ---------------------------------------------------------------------------
-// Control-flow tests for the NEXT milestone (if / while).
+// Control-flow tests for Milestone 7 (if / while).
 //
-// These are SKIPPED for now: the language cannot yet lex or parse `if`, `while`,
-// blocks `{ }`, or assignment `x = ...`. Running them un-skipped would crash the
-// suite on a null AST node rather than fail cleanly, so each carries a
-// `* doctest::skip()` decorator.
+// SKIPPED for now: the language cannot yet lex or parse `if`, `while`, blocks
+// `{ }`, or assignment `x = ...`. Running them un-skipped would crash the suite
+// on a null AST node, so each carries `* doctest::skip()`.
 //
-// The syntax below is PROVISIONAL — to be confirmed when the milestone starts.
-// Note it implies three sub-features the milestone will bring: statement BLOCKS
-// (`{ ... }`), ASSIGNMENT (`x = expr;`, distinct from `let`), and the `if`/`while`
-// keywords + jump opcodes.
+// PROVISIONAL C-like syntax (confirm when the milestone starts). Implies three
+// sub-features: statement BLOCKS `{ }`, ASSIGNMENT (`x = expr;`), and the
+// `if`/`while` keywords + jump opcodes.
 //
-// TDD workflow: as each feature lands, delete the `* doctest::skip()` on the
-// relevant test to turn it on — watch it go red, then implement until green.
+// TDD: delete `* doctest::skip()` on a test to turn it on — red, then implement
+// until green.
 // ---------------------------------------------------------------------------
 
 TEST_CASE("if without else" * doctest::skip()) {
@@ -33,14 +33,12 @@ TEST_CASE("while loop counts up" * doctest::skip()) {
 }
 
 TEST_CASE("while loop accumulates" * doctest::skip()) {
-    // sum of 1..4 == 10
     CHECK(evaluate("let s = 0; let i = 1; "
                    "while (i <= 4) { s = s + i; i = i + 1; } "
                    "s;") == 10);
 }
 
 TEST_CASE("nested control flow" * doctest::skip()) {
-    // count how many of 1..6 are even, using if inside while
     CHECK(evaluate("let count = 0; let i = 1; "
                    "while (i <= 6) { "
                    "  if (i - (i / 2) * 2 == 0) { count = count + 1; } "

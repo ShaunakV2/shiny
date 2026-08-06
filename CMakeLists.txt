@@ -31,9 +31,16 @@ target_link_libraries(compiler PRIVATE compiler_core)
 enable_testing()
 add_executable(tests
         tests/test_main.cpp
-        tests/test_eval.cpp
-        tests/test_control_flow.cpp
+        tests/unit/test_lexer.cpp
+        tests/unit/test_parser.cpp
+        tests/unit/test_compiler.cpp
+        tests/unit/test_vm.cpp
+        tests/integration/test_eval.cpp
+        tests/integration/test_control_flow.cpp
 )
 target_link_libraries(tests PRIVATE compiler_core)
-target_include_directories(tests PRIVATE ${CMAKE_SOURCE_DIR}/tests)
+# tests/ for doctest.h, tests/support/ for helpers.h
+target_include_directories(tests PRIVATE
+        ${CMAKE_SOURCE_DIR}/tests
+        ${CMAKE_SOURCE_DIR}/tests/support)
 add_test(NAME unit_tests COMMAND tests)

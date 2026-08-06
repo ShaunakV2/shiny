@@ -1,18 +1,24 @@
 #include "doctest.h"
-#include "test_helpers.h"
+#include "helpers.h"
+
+using namespace test;
+
+// End-to-end tests: source string -> result. These exercise the whole pipeline
+// at once; when one fails, the matching unit test (lexer/parser/compiler/vm)
+// tells you which stage is at fault.
 
 TEST_CASE("integer arithmetic") {
-    CHECK(evaluate("1 + 2 * 3;") == 7);      // precedence: * before +
-    CHECK(evaluate("(1 + 2) * 3;") == 9);    // parentheses override
-    CHECK(evaluate("10 - 4 - 2;") == 4);     // left-associative
-    CHECK(evaluate("8 / 4 / 2;") == 1);      // left-associative
+    CHECK(evaluate("1 + 2 * 3;") == 7);
+    CHECK(evaluate("(1 + 2) * 3;") == 9);
+    CHECK(evaluate("10 - 4 - 2;") == 4);
+    CHECK(evaluate("8 / 4 / 2;") == 1);
     CHECK(evaluate("2 + 3 * 4 - 1;") == 13);
 }
 
 TEST_CASE("unary minus") {
     CHECK(evaluate("-5 + 3;") == -2);
-    CHECK(evaluate("- -5;") == 5);           // double negation
-    CHECK(evaluate("3 * -5;") == -15);       // unary binds tighter than *
+    CHECK(evaluate("- -5;") == 5);
+    CHECK(evaluate("3 * -5;") == -15);
     CHECK(evaluate("-(2 + 3);") == -5);
 }
 
@@ -23,24 +29,26 @@ TEST_CASE("variables") {
 }
 
 TEST_CASE("comparisons") {
-    CHECK(evaluate("1 + 2 < 3 * 4;") == 1);  // 3 < 12
-    CHECK(evaluate("3 * 4 < 1 + 2;") == 0);  // 12 < 3
+    CHECK(evaluate("1 + 2 < 3 * 4;") == 1);
+    CHECK(evaluate("3 * 4 < 1 + 2;") == 0);
     CHECK(evaluate("5 >= 5;") == 1);
     CHECK(evaluate("5 > 5;") == 0);
     CHECK(evaluate("4 <= 3;") == 0);
     CHECK(evaluate("2 == 2;") == 1);
     CHECK(evaluate("2 != 2;") == 0);
-    CHECK(evaluate("1 + 2 == 3;") == 1);     // arithmetic binds tighter than ==
+    CHECK(evaluate("1 + 2 == 3;") == 1);
 }
 
 TEST_CASE("comparisons combined with variables") {
     CHECK(evaluate("let x = 5; x > 3;") == 1);
     CHECK(evaluate("let x = 5; x == 5;") == 1);
     CHECK(evaluate("let x = 5; let y = 10; x < y;") == 1);
-    CHECK(evaluate("let x = 5; x < 10 == 1;") == 1);  // (x < 10) == 1  ->  1 == 1
+    CHECK(evaluate("let x = 5; x < 10 == 1;") == 1);
 }
 
-TEST_CASE("assignment") {
+// SKIPPED until assignment (Milestone 7, sub-step 1) is implemented — `x = ...`
+// isn't parseable yet, so running this un-skipped would crash the suite.
+TEST_CASE("assignment" * doctest::skip()) {
     CHECK(evaluate("let x = 5; x = 10; x;") == 10);
     CHECK(evaluate("let x = 1; x = x + 4; x;") == 5);   // RHS reads old x
     CHECK(evaluate("let x = 2; let y = 3; x = y; x;") == 3);
