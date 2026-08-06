@@ -48,7 +48,7 @@ TEST_CASE("comparisons combined with variables") {
 
 // SKIPPED until assignment (Milestone 7, sub-step 1) is implemented — `x = ...`
 // isn't parseable yet, so running this un-skipped would crash the suite.
-TEST_CASE("assignment" * doctest::skip()) {
+TEST_CASE("assignment") {
     CHECK(evaluate("let x = 5; x = 10; x;") == 10);
     CHECK(evaluate("let x = 1; x = x + 4; x;") == 5);   // RHS reads old x
     CHECK(evaluate("let x = 2; let y = 3; x = y; x;") == 3);

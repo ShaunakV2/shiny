@@ -87,12 +87,9 @@ int VM::run(const std::vector<Instruction> &code) {
             stack_.push(left != right ? 1 : 0);
         }
         else if (instr.kind == InstructionKind::Store) {
-
             const int val = stack_.top();
             stack_.pop();
-
             const int slot = instr.value.value();
-
             if (slot >= static_cast<int>(slots_.size())) {
                 slots_.resize(slot + 1);
             }
