@@ -39,3 +39,9 @@ TEST_CASE("comparisons combined with variables") {
     CHECK(evaluate("let x = 5; let y = 10; x < y;") == 1);
     CHECK(evaluate("let x = 5; x < 10 == 1;") == 1);  // (x < 10) == 1  ->  1 == 1
 }
+
+TEST_CASE("assignment") {
+    CHECK(evaluate("let x = 5; x = 10; x;") == 10);
+    CHECK(evaluate("let x = 1; x = x + 4; x;") == 5);   // RHS reads old x
+    CHECK(evaluate("let x = 2; let y = 3; x = y; x;") == 3);
+}
