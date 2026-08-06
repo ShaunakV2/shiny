@@ -76,15 +76,26 @@ std::unique_ptr<Stmt> Parser::parseExprStatement() {
 
 std::unique_ptr<Stmt> Parser::parseStatement() {
     // If the first token is let we know that the following will be a let Statement
+    if (check(TokenKind::LBrace)) {
+        return parseBlock();
+    }
     if (check(TokenKind::Let)) {
         return parseLetStatement();
     }
-    else if (check(TokenKind::Identifier) && peekNext().kind == TokenKind::Assign) {
+    if (check(TokenKind::Identifier) && peekNext().kind == TokenKind::Assign) {
         return parseAssignStatement();
     }
-    else {
-        return parseExprStatement();
+    return parseExprStatement();
+}
+
+std::unique_ptr<Stmt> Parser::parseBlock() {
+    advance();                                    // consume {
+    std::vector<std::unique_ptr<Stmt>> statements;
+    while (!check(TokenKind::RBrace) && !check(TokenKind::EndOfFile)) {
+        statements.push_back(parseStatement());
     }
+    advance();                                    // consume }
+    return std::make_unique<BlockStatement>(std::move(statements));
 }
 
 std::unique_ptr<Expr> Parser::parseExpression() {

@@ -47,4 +47,17 @@ struct ExprStatement:Stmt {
     explicit ExprStatement(std::unique_ptr<Expr> v): value(std::move(v)){}
 };
 
+struct BlockStatement:Stmt {
+    std::vector<std::unique_ptr<Stmt>> statements;
+    void print(std::ostream& os) const override {
+        os << "(block";
+        for (const std::unique_ptr<Stmt>& s : statements) {
+            os << " ";
+            s->print(os);       // recurse into each inner statement
+        }
+        os << ")";
+    }
+    explicit BlockStatement(std::vector<std::unique_ptr<Stmt>> s) : statements(std::move(s)){}
+};
+
 #endif //COMPILER_STMT_H

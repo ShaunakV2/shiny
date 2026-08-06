@@ -35,7 +35,7 @@ TEST_CASE("parser: assignment statement") {
 
 // SKIPPED until blocks parse. Expected assumes BlockStatement::print emits
 // "(block <stmt> <stmt> ...)" — adjust if you choose a different format.
-TEST_CASE("parser: block groups statements" * doctest::skip()) {
+TEST_CASE("parser: block groups statements") {
     CHECK(astToString("{ let x = 1; x; }") == "(block (let x = 1) x)");
     CHECK(astToString("{ }") == "(block)");
 }
