@@ -41,6 +41,7 @@ private:
 
     std::unique_ptr<Stmt> parseStatement();
     std::unique_ptr<Stmt> parseLetStatement();
+    std::unique_ptr<Stmt> parseAssignStatement();
     std::unique_ptr<Stmt> parseExprStatement();
 };
 

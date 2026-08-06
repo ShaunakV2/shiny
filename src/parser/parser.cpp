@@ -59,7 +59,6 @@ std::unique_ptr<Stmt> Parser::parseExprStatement() {
 }
 
 
-
 std::unique_ptr<Stmt> Parser::parseStatement() {
     // If the first token is let we know that the following will be a let Statement
     if (check(TokenKind::Let)) {
