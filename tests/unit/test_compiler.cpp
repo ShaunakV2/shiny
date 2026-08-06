@@ -33,3 +33,9 @@ TEST_CASE("compiler: assignment stores into the existing slot") {
     CHECK(bytecodeToString("let x = 1; x = x + 4;") ==
           "Push(1) Store(0) Load(0) Push(4) Add Store(0)");
 }
+
+// SKIPPED until blocks compile. A block is transparent at the bytecode level —
+// it just emits its inner statements' code, no wrapper opcode.
+TEST_CASE("compiler: block emits inner statements' bytecode" * doctest::skip()) {
+    CHECK(bytecodeToString("{ let x = 5; x; }") == "Push(5) Store(0) Load(0)");
+}

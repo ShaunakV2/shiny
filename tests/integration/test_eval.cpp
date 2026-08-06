@@ -53,3 +53,10 @@ TEST_CASE("assignment") {
     CHECK(evaluate("let x = 1; x = x + 4; x;") == 5);   // RHS reads old x
     CHECK(evaluate("let x = 2; let y = 3; x = y; x;") == 3);
 }
+
+// SKIPPED until blocks work end-to-end. A block runs its statements in order;
+// with flat scoping, a block can read/write outer variables.
+TEST_CASE("blocks" * doctest::skip()) {
+    CHECK(evaluate("let x = 0; { x = 5; } x;") == 5);
+    CHECK(evaluate("{ let x = 1; let y = 2; x + y; }") == 3);
+}

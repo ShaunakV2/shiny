@@ -42,6 +42,15 @@ Token Lexer::readIdentifier() {
     if (val == "let") {
         return Token{.kind = TokenKind::Let, .name = val};
     }
+    if (val == "if") {
+        return Token{.kind = TokenKind::If};
+    }
+    if (val == "else") {
+        return Token{.kind = TokenKind::Else};
+    }
+    if (val == "while") {
+        return Token{.kind = TokenKind::While};
+    }
     return Token{.kind = TokenKind::Identifier, .name = val};
 
 }
@@ -75,6 +84,14 @@ std::vector<Token> Lexer::tokenize() {
         }
         else if (c == '(') {
             tokens.push_back(Token{TokenKind::LParen, std::nullopt});
+            advance();
+        }
+        else if (c== '{') {
+            tokens.push_back(Token{TokenKind::LBrace, std::nullopt});
+            advance();
+        }
+        else if (c =='}') {
+            tokens.push_back(Token{TokenKind::RBrace, std::nullopt});
             advance();
         }
         else if (c == ')') {

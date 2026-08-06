@@ -35,13 +35,13 @@ TEST_CASE("lexer: single '=' stays Assign, not EqualEqual") {
 // `{` as Unknown — but skipped keeps the suite green until implemented.)
 // Assumes TokenKinds: If, Else, While, LBrace, RBrace.
 
-TEST_CASE("lexer: if / else / braces" * doctest::skip()) {
+TEST_CASE("lexer: if / else / braces") {
     CHECK(tokensToString("if (x < 2) { } else { }") ==
           "If LParen Identifier(x) Less Integer(2) RParen LBrace RBrace "
           "Else LBrace RBrace EndOfFile");
 }
 
-TEST_CASE("lexer: while / braces" * doctest::skip()) {
+TEST_CASE("lexer: while / braces" ) {
     CHECK(tokensToString("while (x) { }") ==
           "While LParen Identifier(x) RParen LBrace RBrace EndOfFile");
 }

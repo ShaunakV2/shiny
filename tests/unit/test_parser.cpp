@@ -32,3 +32,10 @@ TEST_CASE("parser: assignment statement") {
     CHECK(astToString("x = 10;") == "(assign x = 10)");
     CHECK(astToString("x = x + 4;") == "(assign x = (+ x 4))");  // RHS is a full expression
 }
+
+// SKIPPED until blocks parse. Expected assumes BlockStatement::print emits
+// "(block <stmt> <stmt> ...)" — adjust if you choose a different format.
+TEST_CASE("parser: block groups statements" * doctest::skip()) {
+    CHECK(astToString("{ let x = 1; x; }") == "(block (let x = 1) x)");
+    CHECK(astToString("{ }") == "(block)");
+}

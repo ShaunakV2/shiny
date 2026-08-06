@@ -16,11 +16,16 @@ enum class TokenKind {
     Slash,
     LParen,
     RParen,
+    LBrace,
+    RBrace,
     EndOfFile,
     Identifier,
     Let,
     Assign,
     Semicolon,
+    If,
+    Else,
+    While,
     EqualEqual,
     Greater,
     Less,
@@ -41,11 +46,16 @@ inline std::string tokenKindName(TokenKind kind) {
         case TokenKind::Slash:      return "Slash";
         case TokenKind::LParen:     return "LParen";
         case TokenKind::RParen:     return "RParen";
+        case TokenKind::LBrace:     return "LBrace";
+        case TokenKind::RBrace:     return "RBrace";
         case TokenKind::EndOfFile:  return "EndOfFile";
         case TokenKind::Identifier: return "Identifier";
         case TokenKind::Let:        return "Let";
         case TokenKind::Assign:     return "Assign";
         case TokenKind::Semicolon:  return "Semicolon";
+        case TokenKind::If:         return "If";
+        case TokenKind::Else:       return "Else";
+        case TokenKind::While:      return "While";
         case TokenKind::EqualEqual: return "EqualEqual";
         case TokenKind::Greater:    return "Greater";
         case TokenKind::Less:       return "Less";
@@ -68,6 +78,8 @@ inline const char* tokenKindSymbol(TokenKind kind) {
         case TokenKind::Semicolon: return ";";
         case TokenKind::LParen:    return "(";
         case TokenKind::RParen:    return ")";
+        case TokenKind::LBrace:    return "{";
+        case TokenKind::RBrace:    return "}";
         case TokenKind::EqualEqual: return "==";
         case TokenKind::Greater:    return ">";
         case TokenKind::Less:       return "<";
