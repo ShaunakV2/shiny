@@ -28,7 +28,7 @@ TEST_CASE("compiler: comparisons map to their opcodes") {
 // SKIPPED until `x = ...` compiles. Assignment reuses Store into the variable's
 // EXISTING slot (no new opcode) — it looks like `let` but must not allocate a
 // new slot.
-TEST_CASE("compiler: assignment stores into the existing slot" * doctest::skip()) {
+TEST_CASE("compiler: assignment stores into the existing slot") {
     CHECK(bytecodeToString("let x = 5; x = 10;") == "Push(5) Store(0) Push(10) Store(0)");
     CHECK(bytecodeToString("let x = 1; x = x + 4;") ==
           "Push(1) Store(0) Load(0) Push(4) Add Store(0)");

@@ -17,13 +17,17 @@ void Compiler::compileStmt(const Stmt &line) {
     if (auto* lt = dynamic_cast<const LetStatement*>(&line)) {
         compileExpr(*lt->value);
         const int idx = std::ssize(symbols_);
-        Compiler::symbols_[lt->name] = idx;
-        Compiler::code_.push_back(Instruction(InstructionKind::Store, idx));
+        symbols_[lt->name] = idx;
+        code_.push_back(Instruction(InstructionKind::Store, idx));
+    }
+    else if (auto* as = dynamic_cast<const AssignStatement*>(&line)) {
+        compileExpr((*as->value));
+        int idx = symbols_[as->name];
+        code_.push_back(Instruction(InstructionKind::Store, idx));
     }
     else if (auto* exst = dynamic_cast<const ExprStatement*>(&line)) {
         compileExpr(*exst->value);
     }
-
 }
 
 void Compiler::compileExpr(const Expr& node) {
