@@ -26,6 +26,7 @@ enum class TokenKind {
     If,
     Else,
     While,
+    Print,
     EqualEqual,
     Greater,
     Less,
@@ -56,6 +57,7 @@ inline std::string tokenKindName(TokenKind kind) {
         case TokenKind::If:         return "If";
         case TokenKind::Else:       return "Else";
         case TokenKind::While:      return "While";
+        case TokenKind::Print:      return "Print";
         case TokenKind::EqualEqual: return "EqualEqual";
         case TokenKind::Greater:    return "Greater";
         case TokenKind::Less:       return "Less";
