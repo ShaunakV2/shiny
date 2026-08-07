@@ -1,0 +1,7 @@
+# Top-level ESP-IDF project file.
+# Pulls in the ESP-IDF build system, then declares the project. ESP-IDF
+# auto-discovers components under components/ and the special main/ component.
+cmake_minimum_required(VERSION 3.16)
+
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+project(compiler_firmware)

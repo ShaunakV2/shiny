@@ -116,6 +116,16 @@ int VM::run(const std::vector<Instruction> &code) {
             stack_.pop();
             std::cout << val << "\n";
         }
+        else if (instr.kind == InstructionKind::CallNative) {
+            natives_[instr.value.value()](stack_);   // look up by id, hand it the stack
+        }
     }
     return stack_.empty() ? 0 : stack_.top();
 };
+
+void VM::registerNative(int id, NativeFn fn) {
+    if (id >= static_cast<int>(natives_.size())) {
+        natives_.resize(id + 1);
+    }
+    natives_[id] = std::move(fn);
+}

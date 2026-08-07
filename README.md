@@ -10,6 +10,10 @@ custom bytecode, and executed on a stack-based virtual machine — the full
 front-to-back pipeline of a real language implementation.
 
 > _The language is currently unnamed — rename the project/title as you like._
+>
+> _The same VM also runs on an ESP32 microcontroller, driving real hardware. That
+> lives in a separate [`firmware/`](firmware/) project so the language core stays
+> platform-independent — see [`firmware/README.md`](firmware/README.md)._
 
 ## Pipeline
 
@@ -28,14 +32,32 @@ Source code
 
 - **Integer arithmetic** — `+ - * /`, parentheses, and unary minus, with correct
   operator precedence and associativity.
-- **Variables** — `let` bindings that can be read back and reused.
+- **Variables** — `let` bindings plus reassignment (`x = ...`), read back and reused.
+- **Comparisons** — `< > <= >= == !=`, with booleans represented as integers (`1`/`0`).
+- **Control flow** — `if` / `else`, `while` loops, and `{ }` blocks, compiled to
+  jump instructions over a runtime program counter. (The language is
+  Turing-complete.)
+- **Output** — a `print` statement.
 - **Semantic analysis** — a compile-time **symbol table** resolves each variable
   name to a numbered storage slot, so no variable names survive into the runtime.
-- **Custom bytecode + stack VM** — a small instruction set (`Push`, `Add`, `Sub`,
-  `Mul`, `Div`, `Neg`, `Load`, `Store`, …) executed against a value stack and
+- **Custom bytecode + stack VM** — a compact instruction set (`Push`, `Add`,
+  `Sub`, `Mul`, `Div`, `Neg`, `Load`, `Store`, the six comparisons, `Jump`,
+  `JumpIfFalse`, `Print`, `CallNative`) executed against a value stack and
   slot-indexed variable storage.
+- **Bytecode serialization** — a program compiles to a compact, self-describing
+  byte format and back, so compiled code can be stored or shipped over a wire.
 
 ### Example
+
+```
+let i = 0;
+while (i < 3) {
+    print i;
+    i = i + 1;
+}
+```
+
+prints `0`, `1`, `2`. And an arithmetic program like
 
 ```
 let x = 5;
@@ -55,11 +77,14 @@ and evaluates to `11`.
 
 - [x] Lexer, recursive-descent parser, AST
 - [x] Bytecode compiler + stack VM (arithmetic)
-- [x] Variables (`let`) with symbol-table name resolution
-- [ ] Comparisons & booleans (`< > <= >= == != && ||`)
-- [ ] Control flow (`if` / `while`) — jumps and a program counter
-- [ ] `print` / output statements
+- [x] Variables (`let`, assignment) with symbol-table name resolution
+- [x] Comparisons & booleans (`< > <= >= == !=`)
+- [x] Control flow (`if` / `else` / `while`) — jumps and a program counter
+- [x] `print` / output statements
+- [x] Bytecode serialization (program ⇄ bytes)
+- [ ] Logical operators (`&& || !`) with short-circuit evaluation
 - [ ] Functions (parameters, return values, a call stack)
+- [ ] Call-expression syntax (so native/hardware calls can be written in-language)
 - [ ] Parser error handling & diagnostics
 - [ ] Optimization passes and internal refactors (visitor-based AST dispatch,
       jump-table VM dispatch)
@@ -76,9 +101,13 @@ and evaluates to `11`.
 - **Slot-based variables** — the compiler resolves each name to an integer slot at
   compile time; the VM stores values in a flat vector indexed by slot. Names are
   resolved away before runtime.
+- **Control flow via jumps** — `if`/`while` compile to `Jump` / `JumpIfFalse`
+  against a mutable program counter, with forward jumps *backpatched* once their
+  target is known. No control-flow constructs exist at the bytecode level.
 - **Clean stage boundaries** — the compiler and VM communicate through *only* the
   bytecode. The compiler never touches runtime storage; the VM never sees a
-  variable name.
+  variable name. (This boundary is also what lets the VM run on a microcontroller
+  with the compiler left behind on the host — see [`firmware/`](firmware/).)
 
 ## Build & run
 
@@ -98,12 +127,15 @@ result.
 The core compiler logic is built as a static library (`compiler_core`) that both
 the CLI and the test runner link against. Tests use
 [doctest](https://github.com/doctest/doctest) (vendored as a single header) and
-are written test-first (TDD) — each check drives a source program end-to-end
-(lex → parse → compile → run) and asserts on the result:
+are written test-first (TDD). The suite is split **per stage** — the lexer,
+parser, compiler, and VM are each tested in isolation, and integration tests
+drive whole programs end-to-end:
 
 ```cpp
-CHECK(evaluate("let x = 5; let y = x * 2; y + 1;") == 11);
-CHECK(evaluate("1 + 2 < 3 * 4;") == 1);
+CHECK(tokensToString("1 + 2") == "Integer(1) Plus Integer(2) EndOfFile");  // lexer
+CHECK(astToString("1 + 2 * 3;") == "(+ 1 (* 2 3))");                       // parser
+CHECK(bytecodeToString("print 5;") == "Push(5) Print");                    // compiler
+CHECK(evaluate("let x = 5; let y = x * 2; y + 1;") == 11);                 // end-to-end
 ```
 
 Build and run the suite:
@@ -115,6 +147,8 @@ cmake --build build --target tests
 ctest --test-dir build
 ```
 
+Run one stage with a filter, e.g. `./build/tests --test-case="vm:*"`.
+
 ## Project structure
 
 ```
@@ -122,15 +156,17 @@ src/
 ├── lexer/       tokenizer and token definitions
 ├── parser/      recursive-descent parser
 ├── ast/         expression and statement node types
-├── bytecode/    instruction set definition
+├── bytecode/    instruction set + (de)serialization
 ├── compiler/    AST → bytecode, with the symbol table
 ├── vm/          stack-based bytecode interpreter
 └── main.cpp     CLI driver
 tests/
-├── doctest.h    vendored test framework
+├── doctest.h        vendored test framework
 ├── test_main.cpp    test-runner entry point
-├── test_helpers.h   end-to-end evaluate() helper
-└── test_eval.cpp    behavior tests
+├── support/         per-stage + end-to-end test helpers
+├── unit/            lexer / parser / compiler / vm / serialize tests
+└── integration/     end-to-end evaluation & control-flow tests
+firmware/            embeds the VM on an ESP32 (separate project — see its README)
 ```
 
 ## Motivation
