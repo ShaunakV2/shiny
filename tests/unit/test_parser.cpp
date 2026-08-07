@@ -58,3 +58,8 @@ TEST_CASE("parser: while loop" ) {
     CHECK(astToString("while (i < 3) { i = i + 1; }") ==
           "(while (< i 3) (block (assign i = (+ i 1))))");
 }
+
+// --- Milestone 8 (print) ---
+TEST_CASE("parser: print statement" * doctest::skip()) {
+    CHECK(astToString("print x + 1;") == "(print (+ x 1))");
+}

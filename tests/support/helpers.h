@@ -10,6 +10,7 @@
 //   run               — VM output       (int; runs a hand-built instruction vector)
 //   evaluate          — end-to-end      (int; source -> result)
 
+#include <iostream>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -90,6 +91,16 @@ inline int run(const std::vector<Instruction>& code) {
 // ---- End to end ----
 inline int evaluate(const std::string& src) {
     return run(compile(src));
+}
+
+// Captures everything a program prints (via the `print` statement) during
+// execution — redirects std::cout into a buffer for the duration of the run.
+inline std::string output(const std::string& src) {
+    std::ostringstream captured;
+    std::streambuf* previous = std::cout.rdbuf(captured.rdbuf());
+    run(compile(src));
+    std::cout.rdbuf(previous);
+    return captured.str();
 }
 
 }  // namespace test

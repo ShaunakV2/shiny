@@ -65,3 +65,9 @@ TEST_CASE("compiler: while loop emits a backward Jump to the loop top") {
           "Push(0) Store(0) Load(0) Push(3) Less JumpIfFalse(11) "
           "Load(0) Push(1) Add Store(0) Jump(2)");
 }
+
+// --- Milestone 8 (print) ---
+TEST_CASE("compiler: print emits Print after its expression" * doctest::skip()) {
+    CHECK(bytecodeToString("print 5;") == "Push(5) Print");
+    CHECK(bytecodeToString("print 1 + 2;") == "Push(1) Push(2) Add Print");
+}

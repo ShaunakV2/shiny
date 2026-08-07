@@ -60,3 +60,11 @@ TEST_CASE("blocks" * doctest::skip()) {
     CHECK(evaluate("let x = 0; { x = 5; } x;") == 5);
     CHECK(evaluate("{ let x = 1; let y = 2; x + y; }") == 3);
 }
+
+// --- Milestone 8 (print): behavior via captured output ---
+TEST_CASE("print outputs values (newline-separated)" * doctest::skip()) {
+    CHECK(output("print 5;") == "5\n");
+    CHECK(output("print 1 + 2;") == "3\n");
+    CHECK(output("let x = 4; print x; print x * 2;") == "4\n8\n");
+    CHECK(output("let i = 0; while (i < 3) { print i; i = i + 1; }") == "0\n1\n2\n");
+}
