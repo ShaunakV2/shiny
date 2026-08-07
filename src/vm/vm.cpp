@@ -7,7 +7,10 @@
 #include <iostream>
 
 int VM::run(const std::vector<Instruction> &code) {
-    for (const Instruction& instr : code) {
+    size_t pc = 0;
+    while (pc<code.size()) {
+        const Instruction& instr = code[pc];
+        pc++;
         if (instr.kind == InstructionKind::Push) {
             stack_.push(instr.value.value());
         }
@@ -99,6 +102,14 @@ int VM::run(const std::vector<Instruction> &code) {
         else if (instr.kind == InstructionKind::Load) {
             int val = slots_[instr.value.value()];
             stack_.push(val);
+        }
+        else if (instr.kind == InstructionKind::Jump) {
+            pc = instr.value.value();
+        }
+        else if (instr.kind == InstructionKind::JumpIfFalse) {
+            int cond = stack_.top();
+            stack_.pop();
+            if (cond == 0) pc = instr.value.value();
         }
     }
     return stack_.top();

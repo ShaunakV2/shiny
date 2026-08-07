@@ -28,6 +28,27 @@ void Compiler::compileStmt(const Stmt &line) {
     else if (auto* exst = dynamic_cast<const ExprStatement*>(&line)) {
         compileExpr(*exst->value);
     }
+    else if (auto* block = dynamic_cast<const BlockStatement*>(&line)) {
+        for (const std::unique_ptr<Stmt>& s : block->statements) {
+            compileStmt(*s);
+        }
+    }
+    else if (auto* ifst = dynamic_cast<const IfStatement*>(&line)) {
+        compileExpr(*ifst->condition);
+        int jifIdx = code_.size();
+        code_.push_back(Instruction{InstructionKind::JumpIfFalse, -1});
+        compileStmt(*ifst->thenBranch);
+        if (ifst->elseBranch) {
+            int jmpIdx = code_.size();
+            code_.push_back(Instruction{InstructionKind::Jump, -1});
+            code_[jifIdx].value = code_.size();
+            compileStmt(*ifst->elseBranch);
+            code_[jmpIdx].value = code_.size();
+        }
+        else {
+            code_[jifIdx].value = code_.size();
+        }
+    }
 }
 
 void Compiler::compileExpr(const Expr& node) {

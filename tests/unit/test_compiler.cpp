@@ -39,3 +39,29 @@ TEST_CASE("compiler: assignment stores into the existing slot") {
 TEST_CASE("compiler: block emits inner statements' bytecode" * doctest::skip()) {
     CHECK(bytecodeToString("{ let x = 5; x; }") == "Push(5) Store(0) Load(0)");
 }
+
+// --- Milestone 7 (control flow): if / else jumps ---
+// SKIPPED until if/else compiles. The jump TARGET ADDRESSES below assume the
+// standard layout: compile the condition, then JumpIfFalse over the then-branch;
+// for else, a Jump over the else-branch. VERIFY against your actual
+// bytecodeToString output when you un-skip — backpatched addresses depend on
+// your exact codegen, so adjust the numbers to match reality if they differ.
+TEST_CASE("compiler: if without else emits a forward JumpIfFalse") {
+    CHECK(bytecodeToString("let r = 0; if (2 < 1) { r = 1; }") ==
+          "Push(0) Store(0) Push(2) Push(1) Less JumpIfFalse(8) Push(1) Store(0)");
+}
+
+TEST_CASE("compiler: if/else emits JumpIfFalse to else and Jump to end") {
+    CHECK(bytecodeToString("let r = 0; if (2 < 1) { r = 1; } else { r = 2; }") ==
+          "Push(0) Store(0) Push(2) Push(1) Less JumpIfFalse(9) "
+          "Push(1) Store(0) Jump(11) Push(2) Store(0)");
+}
+
+// SKIPPED until while compiles. The forward JumpIfFalse (exit) is backpatched;
+// the Jump at the bottom is a BACKWARD jump whose target (the loop top = index 2)
+// is known immediately, no backpatch. VERIFY the addresses against actual output.
+TEST_CASE("compiler: while loop emits a backward Jump to the loop top" * doctest::skip()) {
+    CHECK(bytecodeToString("let i = 0; while (i < 3) { i = i + 1; }") ==
+          "Push(0) Store(0) Load(0) Push(3) Less JumpIfFalse(11) "
+          "Load(0) Push(1) Add Store(0) Jump(2)");
+}

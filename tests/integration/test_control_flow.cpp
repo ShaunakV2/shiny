@@ -18,12 +18,12 @@ using namespace test;
 // until green.
 // ---------------------------------------------------------------------------
 
-TEST_CASE("if without else" * doctest::skip()) {
+TEST_CASE("if without else" ) {
     CHECK(evaluate("let x = 0; if (1 < 2) { x = 10; } x;") == 10);  // taken
     CHECK(evaluate("let x = 0; if (2 < 1) { x = 10; } x;") == 0);   // not taken
 }
 
-TEST_CASE("if / else" * doctest::skip()) {
+TEST_CASE("if / else" ) {
     CHECK(evaluate("let x = 0; if (1 < 2) { x = 1; } else { x = 2; } x;") == 1);
     CHECK(evaluate("let x = 0; if (2 < 1) { x = 1; } else { x = 2; } x;") == 2);
 }
