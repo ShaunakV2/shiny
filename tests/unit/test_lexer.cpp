@@ -47,6 +47,6 @@ TEST_CASE("lexer: while / braces" ) {
 }
 
 // --- Milestone 8 (print) ---
-TEST_CASE("lexer: print keyword" * doctest::skip()) {
+TEST_CASE("lexer: print keyword") {
     CHECK(tokensToString("print x;") == "Print Identifier(x) Semicolon EndOfFile");
 }

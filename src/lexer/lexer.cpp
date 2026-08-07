@@ -51,6 +51,9 @@ Token Lexer::readIdentifier() {
     if (val == "while") {
         return Token{.kind = TokenKind::While};
     }
+    if (val == "print") {
+        return Token{.kind = TokenKind::Print};
+    }
     return Token{.kind = TokenKind::Identifier, .name = val};
 
 }
