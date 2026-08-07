@@ -56,13 +56,13 @@ TEST_CASE("assignment") {
 
 // SKIPPED until blocks work end-to-end. A block runs its statements in order;
 // with flat scoping, a block can read/write outer variables.
-TEST_CASE("blocks" * doctest::skip()) {
+TEST_CASE("blocks") {
     CHECK(evaluate("let x = 0; { x = 5; } x;") == 5);
     CHECK(evaluate("{ let x = 1; let y = 2; x + y; }") == 3);
 }
 
 // --- Milestone 8 (print): behavior via captured output ---
-TEST_CASE("print outputs values (newline-separated)" * doctest::skip()) {
+TEST_CASE("print outputs values (newline-separated)") {
     CHECK(output("print 5;") == "5\n");
     CHECK(output("print 1 + 2;") == "3\n");
     CHECK(output("let x = 4; print x; print x * 2;") == "4\n8\n");

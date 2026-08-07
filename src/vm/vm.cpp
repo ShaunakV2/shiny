@@ -111,6 +111,11 @@ int VM::run(const std::vector<Instruction> &code) {
             stack_.pop();
             if (cond == 0) pc = instr.value.value();
         }
+        else if (instr.kind == InstructionKind::Print) {
+            int val = stack_.top();
+            stack_.pop();
+            std::cout << val << "\n";
+        }
     }
-    return stack_.top();
+    return stack_.empty() ? 0 : stack_.top();
 };
