@@ -60,6 +60,6 @@ TEST_CASE("parser: while loop" ) {
 }
 
 // --- Milestone 8 (print) ---
-TEST_CASE("parser: print statement" * doctest::skip()) {
+TEST_CASE("parser: print statement") {
     CHECK(astToString("print x + 1;") == "(print (+ x 1))");
 }

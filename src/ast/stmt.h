@@ -91,4 +91,14 @@ struct WhileStatement:Stmt {
     explicit WhileStatement(std::unique_ptr<Expr> c, std::unique_ptr<Stmt>  b): condition(std::move(c)), body(std::move(b)){}
 };
 
+struct PrintStatement:Stmt {
+    std::unique_ptr<Expr> value;
+    void print(std::ostream& os) const override {
+        os << "(print ";
+        value->print(os);
+        os << ")";
+    }
+    explicit PrintStatement(std::unique_ptr<Expr> v): value(std::move(v)){}
+};
+
 #endif //COMPILER_STMT_H
