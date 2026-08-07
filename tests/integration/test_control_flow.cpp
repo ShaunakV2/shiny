@@ -28,17 +28,17 @@ TEST_CASE("if / else" ) {
     CHECK(evaluate("let x = 0; if (2 < 1) { x = 1; } else { x = 2; } x;") == 2);
 }
 
-TEST_CASE("while loop counts up" * doctest::skip()) {
+TEST_CASE("while loop counts up") {
     CHECK(evaluate("let x = 0; while (x < 5) { x = x + 1; } x;") == 5);
 }
 
-TEST_CASE("while loop accumulates" * doctest::skip()) {
+TEST_CASE("while loop accumulates" ) {
     CHECK(evaluate("let s = 0; let i = 1; "
                    "while (i <= 4) { s = s + i; i = i + 1; } "
                    "s;") == 10);
 }
 
-TEST_CASE("nested control flow" * doctest::skip()) {
+TEST_CASE("nested control flow") {
     CHECK(evaluate("let count = 0; let i = 1; "
                    "while (i <= 6) { "
                    "  if (i - (i / 2) * 2 == 0) { count = count + 1; } "

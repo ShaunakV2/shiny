@@ -49,6 +49,15 @@ void Compiler::compileStmt(const Stmt &line) {
             code_[jifIdx].value = code_.size();
         }
     }
+    else if (auto* whst = dynamic_cast<const WhileStatement*>(&line)) {
+        int loopStart = code_.size();
+        compileExpr(*whst->condition);
+        int jifIdx = code_.size();
+        code_.push_back(Instruction{InstructionKind::JumpIfFalse, -1});
+        compileStmt(*whst->body);
+        code_.push_back(Instruction{InstructionKind::Jump, loopStart});
+        code_[jifIdx].value = code_.size();
+    }
 }
 
 void Compiler::compileExpr(const Expr& node) {

@@ -60,7 +60,7 @@ TEST_CASE("compiler: if/else emits JumpIfFalse to else and Jump to end") {
 // SKIPPED until while compiles. The forward JumpIfFalse (exit) is backpatched;
 // the Jump at the bottom is a BACKWARD jump whose target (the loop top = index 2)
 // is known immediately, no backpatch. VERIFY the addresses against actual output.
-TEST_CASE("compiler: while loop emits a backward Jump to the loop top" * doctest::skip()) {
+TEST_CASE("compiler: while loop emits a backward Jump to the loop top") {
     CHECK(bytecodeToString("let i = 0; while (i < 3) { i = i + 1; }") ==
           "Push(0) Store(0) Load(0) Push(3) Less JumpIfFalse(11) "
           "Load(0) Push(1) Add Store(0) Jump(2)");
