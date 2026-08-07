@@ -27,6 +27,7 @@ enum class InstructionKind {
     Ne,
     Jump,
     JumpIfFalse,
+    While,
 };
 
 struct Instruction {
@@ -52,6 +53,7 @@ inline std::string instructionKindToString(InstructionKind kind) {
         case InstructionKind::Ne: return "BangEqual";
         case InstructionKind::Jump: return "Jump";
         case InstructionKind::JumpIfFalse: return "JumpIfFalse";
+        case InstructionKind::While: return "While";
     }
     return "Unknown";
 }
