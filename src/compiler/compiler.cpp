@@ -58,6 +58,10 @@ void Compiler::compileStmt(const Stmt &line) {
         code_.push_back(Instruction{InstructionKind::Jump, loopStart});
         code_[jifIdx].value = code_.size();
     }
+    else if (auto* prst = dynamic_cast<const PrintStatement*>(&line)) {
+        compileExpr(*prst->value);
+        code_.push_back(Instruction(InstructionKind::Print));
+    }
 }
 
 void Compiler::compileExpr(const Expr& node) {
