@@ -47,6 +47,7 @@ private:
 
     std::unique_ptr<Stmt> parseBlock();
     std::unique_ptr<Stmt> parseIfStatement();
+    std::unique_ptr<Stmt> parseWhileStatement();
 };
 
 #endif //COMPILER_PARSER_H

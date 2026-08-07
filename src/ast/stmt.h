@@ -78,4 +78,17 @@ struct IfStatement:Stmt {
     explicit IfStatement(std::unique_ptr<Expr> c, std::unique_ptr<Stmt>  tb, std::unique_ptr<Stmt>  eb): condition(std::move(c)), thenBranch(std::move(tb)), elseBranch(std::move(eb)){}
 };
 
+struct WhileStatement:Stmt {
+    std::unique_ptr<Expr> condition;
+    std::unique_ptr<Stmt>  body;
+    void print(std::ostream& os) const override {
+        os << "(while ";
+        condition->print(os);
+        os << " ";
+        body->print(os);
+        os << ")";
+    }
+    explicit WhileStatement(std::unique_ptr<Expr> c, std::unique_ptr<Stmt>  b): condition(std::move(c)), body(std::move(b)){}
+};
+
 #endif //COMPILER_STMT_H

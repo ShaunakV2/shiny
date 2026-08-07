@@ -85,6 +85,9 @@ std::unique_ptr<Stmt> Parser::parseStatement() {
     if (check(TokenKind::If)) {
         return parseIfStatement();
     }
+    if (check(TokenKind::While)) {
+        return parseWhileStatement();
+    }
     if (check(TokenKind::Identifier) && peekNext().kind == TokenKind::Assign) {
         return parseAssignStatement();
     }
@@ -110,6 +113,19 @@ std::unique_ptr<Stmt> Parser::parseIfStatement() {
                                          std::move(thenBranch),
                                          std::move(elseBranch));
 
+}
+
+std::unique_ptr<Stmt> Parser::parseWhileStatement() {
+    advance(); // consume While
+    match(TokenKind::LParen);
+    std::unique_ptr<Expr> condition = parseExpression();
+    match(TokenKind::RParen);
+
+    if (peek().kind != TokenKind::LBrace) return nullptr;
+
+    std::unique_ptr<Stmt> body = parseBlock();
+
+    return std::make_unique<WhileStatement>(std::move(condition),std::move(body));
 }
 
 std::unique_ptr<Stmt> Parser::parseBlock() {

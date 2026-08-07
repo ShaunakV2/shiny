@@ -54,7 +54,7 @@ TEST_CASE("parser: if with else") {
 
 // SKIPPED until `while` parses. Expected assumes WhileStatement::print emits
 // "(while <cond> <body>)" — adjust if you differ.
-TEST_CASE("parser: while loop" * doctest::skip()) {
+TEST_CASE("parser: while loop" ) {
     CHECK(astToString("while (i < 3) { i = i + 1; }") ==
           "(while (< i 3) (block (assign i = (+ i 1))))");
 }
