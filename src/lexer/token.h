@@ -96,6 +96,8 @@ struct Token {
     TokenKind kind;
     std::optional<int> value;
     std::string name;
+    std::size_t offset = 0;
+    std::size_t length = 0;
 };
 
 #endif //COMPILER_TOKEN_H

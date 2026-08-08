@@ -5,6 +5,7 @@
 #include "lexer.h"
 
 #include <iostream>
+#include <unordered_map>
 
 Lexer::Lexer(std::string source): source_(std::move(source)) {
 }
@@ -34,121 +35,87 @@ Token Lexer::readNumber() {
     return Token{TokenKind::Integer, std::stoi(val)};
 }
 
+void Lexer::skipWhitespace() {
+    while (peek() == ' ' || peek() == '\n' || peek() == '\t' || peek() == '\r') {
+        advance();
+    }
+}
+
 Token Lexer::readIdentifier() {
     std::string val;
     while (std::isalpha(peek()) || std::isdigit(peek())|| peek() == '_') {
         val+=advance();
     }
-    if (val == "let") {
-        return Token{.kind = TokenKind::Let, .name = val};
-    }
-    if (val == "if") {
-        return Token{.kind = TokenKind::If};
-    }
-    if (val == "else") {
-        return Token{.kind = TokenKind::Else};
-    }
-    if (val == "while") {
-        return Token{.kind = TokenKind::While};
-    }
-    if (val == "print") {
-        return Token{.kind = TokenKind::Print};
+
+    // Keyword table: built once (static), reused every call.
+    static const std::unordered_map<std::string, TokenKind> keywords = {
+        {"let",   TokenKind::Let},
+        {"if",    TokenKind::If},
+        {"else",  TokenKind::Else},
+        {"while", TokenKind::While},
+        {"print", TokenKind::Print},
+    };
+
+    if (auto it = keywords.find(val); it != keywords.end()) {
+        return Token{.kind = it->second};
     }
     return Token{.kind = TokenKind::Identifier, .name = val};
+}
 
+Token Lexer::scanToken() {
+    char c = peek();
+
+    // Character classes go first — they don't fit switch cases cleanly.
+    if (c >= '0' && c <= '9')        return readNumber();
+    if (std::isalpha(c) || c == '_') return readIdentifier();
+
+    switch (c) {
+        // Single-character tokens.
+        case '+': advance(); return Token{TokenKind::Plus,      std::nullopt};
+        case '-': advance(); return Token{TokenKind::Minus,     std::nullopt};
+        case '*': advance(); return Token{TokenKind::Star,      std::nullopt};
+        case '/': advance(); return Token{TokenKind::Slash,     std::nullopt};
+        case '(': advance(); return Token{TokenKind::LParen,    std::nullopt};
+        case ')': advance(); return Token{TokenKind::RParen,    std::nullopt};
+        case '{': advance(); return Token{TokenKind::LBrace,    std::nullopt};
+        case '}': advance(); return Token{TokenKind::RBrace,    std::nullopt};
+        case ';': advance(); return Token{TokenKind::Semicolon, std::nullopt};
+
+        // Multi-character operators: consume the first char, then peek for a trailing '='.
+        case '<':
+            advance();
+            if (peek() == '=') { advance(); return Token{TokenKind::LessEqual}; }
+            return Token{TokenKind::Less};
+        case '>':
+            advance();
+            if (peek() == '=') { advance(); return Token{TokenKind::GreaterEqual}; }
+            return Token{TokenKind::Greater};
+        case '=':
+            advance();
+            if (peek() == '=') { advance(); return Token{TokenKind::EqualEqual}; }
+            return Token{TokenKind::Assign};
+        case '!':
+            advance();
+            if (peek() == '=') { advance(); return Token{TokenKind::BangEqual}; }
+            return Token{TokenKind::Unknown};   // lone '!' — becomes an error in sub-step 2
+
+        default:
+            advance();
+            return Token{TokenKind::Unknown};   // unknown char — sub-step 2 throws here
+    }
 }
 
 
 std::vector<Token> Lexer::tokenize() {
     std::vector<Token> tokens;
     while (pos_ < source_.size()) {
-        char c = peek();
-        if (c >= '0' && c<= '9') {
-            tokens.push_back(readNumber());
-        }
-        else if (std::isalpha(c) || c == '_') {
-            tokens.push_back(readIdentifier());
-        }
-        else if (c == '+') {
-            tokens.push_back(Token{TokenKind::Plus, std::nullopt});
-            advance();
-        }
-        else if (c == '-') {
-            tokens.push_back(Token{TokenKind::Minus, std::nullopt});
-            advance();
-        }
-        else if (c == '*') {
-            tokens.push_back(Token{TokenKind::Star, std::nullopt});
-            advance();
-        }
-        else if (c == '/') {
-            tokens.push_back(Token{TokenKind::Slash, std::nullopt});
-            advance();
-        }
-        else if (c == '(') {
-            tokens.push_back(Token{TokenKind::LParen, std::nullopt});
-            advance();
-        }
-        else if (c== '{') {
-            tokens.push_back(Token{TokenKind::LBrace, std::nullopt});
-            advance();
-        }
-        else if (c =='}') {
-            tokens.push_back(Token{TokenKind::RBrace, std::nullopt});
-            advance();
-        }
-        else if (c == ')') {
-            tokens.push_back(Token{TokenKind::RParen, std::nullopt});
-            advance();
-        }
-        else if (c == '>') {
-            if (peekAhead() == '=') {
-                tokens.push_back(Token{.kind = TokenKind::GreaterEqual});
-                advance();
-            }
-            else {
-                tokens.push_back(Token{.kind = TokenKind::Greater});
-            }
-            advance();
-        }
-        else if (c == '<') {
-            if (peekAhead() == '=') {
-                tokens.push_back(Token{.kind = TokenKind::LessEqual});
-                advance();
-            }
-            else {
-                tokens.push_back(Token{.kind = TokenKind::Less});
-            }
-            advance();
-        }
-        else if (c == '!') {
-            if (peekAhead() == '=') {
-                tokens.push_back(Token{.kind = TokenKind::BangEqual});
-                advance();
-            }
-            advance();
-        }
-        else if (c == '=') {
-            if (peekAhead() == '=') {
-                tokens.push_back(Token{.kind = TokenKind::EqualEqual});
-                advance();
-            }
-            else {
-                tokens.push_back(Token{.kind = TokenKind::Assign});
-            }
-            advance();
-        }
-        else if (c == ';') {
-            tokens.push_back(Token{.kind = TokenKind::Semicolon});
-            advance();
-        }
-        else if (c == ' ') {
-            advance();
-        }
-        else {
-            tokens.push_back(Token{TokenKind::Unknown, std::nullopt});
-            advance();
-        }
+        skipWhitespace();
+        if (pos_ >= source_.size()) break;
+        std::size_t start = pos_;
+        Token tok = scanToken();
+        tok.offset = start;
+        tok.length = pos_ - start;
+        tokens.push_back(tok);
     }
     tokens.push_back(Token{TokenKind::EndOfFile, std::nullopt});
     return tokens;

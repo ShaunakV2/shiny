@@ -15,7 +15,7 @@ TEST_CASE("lexer: multi-digit numbers and whitespace are skipped") {
 
 TEST_CASE("lexer: let bindings and identifiers") {
     CHECK(tokensToString("let x = 5;") ==
-          "Let(let) Identifier(x) Assign Integer(5) Semicolon EndOfFile");
+          "Let Identifier(x) Assign Integer(5) Semicolon EndOfFile");
 }
 
 TEST_CASE("lexer: multi-character comparison operators (maximal munch)") {
