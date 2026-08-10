@@ -4,6 +4,7 @@
 
 #include "lexer.h"
 
+#include <format>
 #include <iostream>
 #include <unordered_map>
 
@@ -38,7 +39,7 @@ Token Lexer::readNumber() {
     try {
         return Token{TokenKind::Integer, std::stoi(val)};
     } catch (const std::out_of_range&) {
-        throw CompileError("integer literal too large: " + val, start);
+        throw CompileError(std::format("integer literal too large: {}", val), start);
     }
 }
 
@@ -109,7 +110,7 @@ Token Lexer::scanToken() {
             throw CompileError("expected '=' after '!'", start);
         default:
             advance();
-            throw CompileError("unexpected character '" + std::string(1, c) + "'", start);
+            throw CompileError(std::format("unexpected character '{}'", c), start);
            // return Token{TokenKind::Unknown};   // unknown char — sub-step 2 throws here
     }
 }

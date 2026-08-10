@@ -4,7 +4,10 @@
 
 #include "parser.h"
 
+#include <format>
 #include <iostream>
+
+#include "error/error.h"
 
 Parser::Parser(std::vector<Token> tokens) : tokens_(std::move(tokens)){};
 
@@ -28,48 +31,40 @@ const Token &Parser::advance() {
     return tokens_[pos_++];
 }
 
+const Token& Parser::expect(TokenKind kind, const std::string& context) {
+    if (check(kind)) return advance();
+    const Token& tok = peek();
+    throw CompileError(
+        std::format("expected {} {}, found {}",
+                    tokenKindName(kind), context, tokenKindName(tok.kind)),
+        tok.offset);
+}
+
 bool Parser::check(TokenKind kind) const{
     return peek().kind == kind;
 }
-
-bool Parser::match(TokenKind kind) {
-    if (check(kind)) {
-        advance();
-        return true;
-    }
-    return false;
-}
-
 std::unique_ptr<Stmt> Parser::parseLetStatement() {
     // Consume the 'Let' Token
     advance();
-    // The next token is the identifier
-    if (!check(TokenKind::Identifier)) return nullptr;
-    const std::string identifier = advance().name;
-    // Consume the Assign
-    if (!check(TokenKind::Assign)) return nullptr;
-    advance();
+    // The next token has to be the identifier, so we use expect to make sure we get that.
+    const std::string identifier =expect(TokenKind::Identifier,"after 'let'").name;
+    expect(TokenKind::Assign, std::format("after '{}'", identifier)); // expect assign
     auto initializer =  parseExpression();
-    if (!check(TokenKind::Semicolon)) return nullptr;
-    advance();
+    expect(TokenKind::Semicolon, std::format("after declaration of '{}'", identifier)); // finally expect semicolon
     return std::make_unique<LetStatement>(std::move(initializer), identifier);
 }
 
 std::unique_ptr<Stmt> Parser::parseAssignStatement() {
-    // Consume the Identifier and save the name
-    const std::string identifier =advance().name;
-    // Consume the Assign
-    advance();
+    const std::string identifier =advance().name;     // Consume the Identifier and save the name
+    expect(TokenKind::Assign, std::format("after '{}'", identifier)); // expect assign and consume
     auto initializer = parseExpression();
-    if (!check(TokenKind::Semicolon)) return nullptr;
-    advance();
+    expect(TokenKind::Semicolon, std::format("after assignment to '{}'", identifier));
     return std::make_unique<AssignStatement>(std::move(initializer), identifier);
 }
 
 std::unique_ptr<Stmt> Parser::parseExprStatement() {
     auto initializer = parseExpression();
-    if (!check(TokenKind::Semicolon)) return nullptr;
-    advance();
+    expect(TokenKind::Semicolon, "after expression statement");
     return std::make_unique<ExprStatement>(std::move(initializer));
 }
 
@@ -98,12 +93,10 @@ std::unique_ptr<Stmt> Parser::parseStatement() {
 }
 
 std::unique_ptr<Stmt> Parser::parseIfStatement() {
-    advance();
-    match(TokenKind::LParen);
+    advance(); // consume if
+    expect(TokenKind::LParen, "after 'if'");
     std::unique_ptr<Expr> condition = parseExpression();
-    match(TokenKind::RParen);
-
-    if (peek().kind != TokenKind::LBrace) return nullptr;
+    expect(TokenKind::RParen, "after if condition");
 
     std::unique_ptr<Stmt> thenBranch = parseBlock();
 
@@ -119,12 +112,10 @@ std::unique_ptr<Stmt> Parser::parseIfStatement() {
 }
 
 std::unique_ptr<Stmt> Parser::parseWhileStatement() {
-    advance(); // consume While
-    match(TokenKind::LParen);
+    advance(); // consume while
+    expect(TokenKind::LParen, "after 'while'");
     std::unique_ptr<Expr> condition = parseExpression();
-    match(TokenKind::RParen);
-
-    if (peek().kind != TokenKind::LBrace) return nullptr;
+    expect(TokenKind::RParen, "after while condition");
 
     std::unique_ptr<Stmt> body = parseBlock();
 
@@ -134,17 +125,18 @@ std::unique_ptr<Stmt> Parser::parseWhileStatement() {
 std::unique_ptr<Stmt> Parser::parsePrintStatement() {
     advance(); // consume print
     std::unique_ptr<Expr> value = parseExpression();
-    advance(); // consume the ;
+    expect(TokenKind::Semicolon, "after print statement");
     return std::make_unique<PrintStatement>(std::move(value));
 }
 
 std::unique_ptr<Stmt> Parser::parseBlock() {
-    advance();                                    // consume {
+    expect(TokenKind::LBrace, "to open block");
     std::vector<std::unique_ptr<Stmt>> statements;
     while (!check(TokenKind::RBrace) && !check(TokenKind::EndOfFile)) {
         statements.push_back(parseStatement());
     }
-    advance();                                    // consume }
+    // On EOF (unterminated block) the current token isn't RBrace, so this throws.
+    expect(TokenKind::RBrace, "to close block");
     return std::make_unique<BlockStatement>(std::move(statements));
 }
 
@@ -202,7 +194,7 @@ std::unique_ptr<Expr> Parser::parseFactor()  {
     else if (check(TokenKind::LParen)) {
         const Token& tok = advance();
         auto inner = parseExpression();
-        match(TokenKind::RParen);
+        expect(TokenKind::RParen, "to close '('");
         return inner;
     }
     else if (check(TokenKind::Identifier)) {
@@ -210,8 +202,9 @@ std::unique_ptr<Expr> Parser::parseFactor()  {
         return std::make_unique<VariableExpr>(name);
     }
     else {
-        // TODO: Error handling for bad expression
-        return nullptr;
+        throw CompileError(
+            std::format("expected an expression, found {}", tokenKindName(peek().kind)),
+            peek().offset);
     }
 
 }

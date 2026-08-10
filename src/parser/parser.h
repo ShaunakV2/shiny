@@ -24,11 +24,23 @@ private:
     std::size_t pos_ = 0;
 
     // --- token cursor helpers ---
-    const Token& peek() const;          // current token, no consume
-    const Token& peekNext() const;      // next token, no consume
-    const Token& advance();             // return current, then move forward
-    bool check(TokenKind kind) const;   // is current token this kind?
-    bool match(TokenKind kind);         // if current is `kind`, consume it & return true
+    /// return current token, doesn't consume.
+    const Token& peek() const;
+
+    /// returns currToken + 1, doesn't consume.
+    const Token& peekNext() const;
+
+    /// returns currToken and consumes (advances)
+    const Token& advance();
+
+    /// check expected token against what it actually finds, context is plain english we give it based on the actual context of the function where it is being called
+    /// e.g. after let we expect an identifier, therefore we would pass (TokenKind::Identifier, "after 'let'")
+    /// returns compileError if tokenKind is not what is expected
+    const Token& expect(TokenKind kind, const std::string& context);
+
+    /// check if currToken is the same as kind provided
+    bool check(TokenKind kind) const;
+
 
     std::unique_ptr<Expr> parseExpression();
 
