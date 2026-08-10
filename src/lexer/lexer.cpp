@@ -7,6 +7,8 @@
 #include <iostream>
 #include <unordered_map>
 
+#include "error/error.h"
+
 Lexer::Lexer(std::string source): source_(std::move(source)) {
 }
 
@@ -28,11 +30,16 @@ char Lexer::advance() {
 }
 
 Token Lexer::readNumber() {
+    std::size_t start = pos_;
     std::string val;
     while (peek() >= '0' && peek() <= '9') {
-        val+=advance();
+        val += advance();
     }
-    return Token{TokenKind::Integer, std::stoi(val)};
+    try {
+        return Token{TokenKind::Integer, std::stoi(val)};
+    } catch (const std::out_of_range&) {
+        throw CompileError("integer literal too large: " + val, start);
+    }
 }
 
 void Lexer::skipWhitespace() {
@@ -64,6 +71,8 @@ Token Lexer::readIdentifier() {
 
 Token Lexer::scanToken() {
     char c = peek();
+
+    std::size_t start = pos_;
 
     // Character classes go first — they don't fit switch cases cleanly.
     if (c >= '0' && c <= '9')        return readNumber();
@@ -97,11 +106,11 @@ Token Lexer::scanToken() {
         case '!':
             advance();
             if (peek() == '=') { advance(); return Token{TokenKind::BangEqual}; }
-            return Token{TokenKind::Unknown};   // lone '!' — becomes an error in sub-step 2
-
+            throw CompileError("expected '=' after '!'", start);
         default:
             advance();
-            return Token{TokenKind::Unknown};   // unknown char — sub-step 2 throws here
+            throw CompileError("unexpected character '…'", start);
+           // return Token{TokenKind::Unknown};   // unknown char — sub-step 2 throws here
     }
 }
 

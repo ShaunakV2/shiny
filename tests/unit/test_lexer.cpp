@@ -1,5 +1,6 @@
 #include "doctest.h"
 #include "helpers.h"
+#include "error/error.h"
 
 using namespace test;
 
@@ -49,4 +50,21 @@ TEST_CASE("lexer: while / braces" ) {
 // --- Milestone 8 (print) ---
 TEST_CASE("lexer: print keyword") {
     CHECK(tokensToString("print x;") == "Print Identifier(x) Semicolon EndOfFile");
+}
+
+// --- Error handling (sub-step 2): the lexer reports bad input ---
+// These are RED until scanToken/readNumber throw CompileError (currently the
+// unknown-char and lone-'!' sites return an Unknown token, and an oversized
+// number leaks a raw std::out_of_range).
+TEST_CASE("lexer: unknown character is a reported error") {
+    CHECK_THROWS_AS(lex("@"), CompileError);
+    CHECK_THROWS_AS(lex("let x = 1 # 2;"), CompileError);
+}
+
+TEST_CASE("lexer: a lone '!' (not '!=') is a reported error") {
+    CHECK_THROWS_AS(lex("1 ! 2"), CompileError);
+}
+
+TEST_CASE("lexer: an integer literal too large to fit is a reported error") {
+    CHECK_THROWS_AS(lex("99999999999999"), CompileError);
 }
