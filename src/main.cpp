@@ -5,6 +5,8 @@
 
 #include "ast/stmt.h"
 #include "compiler/compiler.h"
+#include "error/error.h"
+#include "error/reporter.h"
 #include "lexer/lexer.h"
 #include "parser/parser.h"
 #include "vm/vm.h"
@@ -14,16 +16,21 @@
 int main() {
     const std::string source = "let x = 5; let y = x * 2; y + 1;";
 
-    Lexer lexer(source);
-    Parser parser(lexer.tokenize());
-    std::vector<std::unique_ptr<Stmt>> program = parser.parse();
+    try {
+        Lexer lexer(source);
+        Parser parser(lexer.tokenize());
+        std::vector<std::unique_ptr<Stmt>> program = parser.parse();
 
-    Compiler compiler;
-    std::vector<Instruction> code = compiler.compile(program);
+        Compiler compiler;
+        std::vector<Instruction> code = compiler.compile(program);
 
-    VM vm;
-    int result = vm.run(code);
+        VM vm;
+        int result = vm.run(code);
 
-    std::cout << source << "\n=> " << result << "\n";
-    return 0;
+        std::cout << source << "\n=> " << result << "\n";
+        return 0;
+    } catch (const CompileError& e) {
+        std::cerr << formatError(source, e) << "\n";
+        return 1;
+    }
 }

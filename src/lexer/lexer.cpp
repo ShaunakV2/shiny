@@ -109,7 +109,7 @@ Token Lexer::scanToken() {
             throw CompileError("expected '=' after '!'", start);
         default:
             advance();
-            throw CompileError("unexpected character '…'", start);
+            throw CompileError("unexpected character '" + std::string(1, c) + "'", start);
            // return Token{TokenKind::Unknown};   // unknown char — sub-step 2 throws here
     }
 }

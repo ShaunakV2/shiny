@@ -18,6 +18,8 @@ add_library(compiler_core
         src/parser/parser.h
         src/bytecode/instruction.h
         src/bytecode/serialize.h
+        src/error/error.h
+        src/error/reporter.h
         src/compiler/compiler.h
         src/vm/vm.h
 )
@@ -37,6 +39,7 @@ add_executable(tests
         tests/unit/test_compiler.cpp
         tests/unit/test_vm.cpp
         tests/unit/test_serialize.cpp
+        tests/unit/test_reporter.cpp
         tests/integration/test_eval.cpp
         tests/integration/test_control_flow.cpp
 )
