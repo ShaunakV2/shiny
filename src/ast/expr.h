@@ -57,7 +57,7 @@ struct UnaryExpr : Expr {
 struct VariableExpr : Expr {
     std::string name;
     std::size_t offset;
-    explicit VariableExpr(std::string n) : name(std::move(n)) {}
+    explicit VariableExpr(std::string n, std::size_t o) : name(std::move(n)), offset(o) {}
     void print(std::ostream& os) const override { os << name; }
 };
 #endif // COMPILER_EXPR_H

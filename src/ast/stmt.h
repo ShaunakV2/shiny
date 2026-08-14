@@ -35,8 +35,8 @@ struct AssignStatement:Stmt {
         value->print(os);
         os << ")";
     }
-    explicit AssignStatement(std::unique_ptr<Expr> v, std::string n)
-    : value(std::move(v)), name(std::move(n)) {}
+    explicit AssignStatement(std::unique_ptr<Expr> v, std::string n, std::size_t o)
+    : value(std::move(v)), name(std::move(n)), offset(o) {}
 };
 
 

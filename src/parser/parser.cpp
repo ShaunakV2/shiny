@@ -55,11 +55,12 @@ std::unique_ptr<Stmt> Parser::parseLetStatement() {
 }
 
 std::unique_ptr<Stmt> Parser::parseAssignStatement() {
-    const std::string identifier =advance().name;     // Consume the Identifier and save the name
+    const std::size_t offset = peek().offset;
+    const std::string identifier =advance().name;    // Consume the Identifier and save the name
     expect(TokenKind::Assign, std::format("after '{}'", identifier)); // expect assign and consume
     auto initializer = parseExpression();
     expect(TokenKind::Semicolon, std::format("after assignment to '{}'", identifier));
-    return std::make_unique<AssignStatement>(std::move(initializer), identifier);
+    return std::make_unique<AssignStatement>(std::move(initializer), identifier, offset);
 }
 
 std::unique_ptr<Stmt> Parser::parseExprStatement() {
@@ -198,8 +199,9 @@ std::unique_ptr<Expr> Parser::parseFactor()  {
         return inner;
     }
     else if (check(TokenKind::Identifier)) {
+        const std::size_t offset = peek().offset;
         const std::string name = advance().name;
-        return std::make_unique<VariableExpr>(name);
+        return std::make_unique<VariableExpr>(name, offset);
     }
     else {
         throw CompileError(

@@ -1,5 +1,6 @@
 #include "doctest.h"
 #include "helpers.h"
+#include "error/error.h"
 
 using namespace test;
 
@@ -70,4 +71,20 @@ TEST_CASE("compiler: while loop emits a backward Jump to the loop top") {
 TEST_CASE("compiler: print emits Print after its expression") {
     CHECK(bytecodeToString("print 5;") == "Push(5) Print");
     CHECK(bytecodeToString("print 1 + 2;") == "Push(1) Push(2) Add Print");
+}
+
+// --- Error handling (sub-step 5): semantic errors ---
+// symbols_ lookups now throw instead of silently inserting slot 0.
+TEST_CASE("compiler: using an undeclared variable is a reported error") {
+    CHECK_THROWS_AS(compile("x + 1;"), CompileError);
+    CHECK_THROWS_AS(compile("let y = x;"), CompileError);   // x never declared
+}
+
+TEST_CASE("compiler: assigning to an undeclared variable is a reported error") {
+    CHECK_THROWS_AS(compile("x = 5;"), CompileError);       // no prior 'let x'
+}
+
+TEST_CASE("compiler: a declared variable still compiles fine") {
+    CHECK(bytecodeToString("let x = 5; x = 10; x;") ==
+          "Push(5) Store(0) Push(10) Store(0) Load(0)");
 }

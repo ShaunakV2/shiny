@@ -4,6 +4,10 @@
 
 #include "compiler.h"
 
+#include <format>
+
+#include "error/error.h"
+
 std::vector<Instruction> Compiler::compile(const std::vector<std::unique_ptr<Stmt>>& statements) {
     int i =0;
     while (statements.size() > i) {
@@ -22,8 +26,13 @@ void Compiler::compileStmt(const Stmt &line) {
     }
     else if (auto* as = dynamic_cast<const AssignStatement*>(&line)) {
         compileExpr((*as->value));
-        int idx = symbols_[as->name];
-        code_.push_back(Instruction(InstructionKind::Store, idx));
+        auto it = symbols_.find(as->name);
+        if (it == symbols_.end()) {
+            throw CompileError(
+                std::format("assignment to undefined variable '{}'", as->name),
+                as->offset);
+        }
+        code_.push_back(Instruction(InstructionKind::Store, it->second));
     }
     else if (auto* exst = dynamic_cast<const ExprStatement*>(&line)) {
         compileExpr(*exst->value);
@@ -107,8 +116,13 @@ void Compiler::compileExpr(const Expr& node) {
         Compiler::code_.push_back(Instruction(InstructionKind::Push, integer_literal->value));
     }
     else if (auto* variable_expr = dynamic_cast<const VariableExpr*>(&node)) {
-        int var_loc = Compiler::symbols_[variable_expr->name];
-        Compiler::code_.push_back(Instruction(InstructionKind::Load, var_loc));
+        auto it = symbols_.find(variable_expr->name);
+        if (it == symbols_.end()) {
+            throw CompileError(
+                std::format("undefined variable '{}'", variable_expr->name),
+                variable_expr->offset);
+        }
+        Compiler::code_.push_back(Instruction(InstructionKind::Load, it->second));
     }
 }
 
