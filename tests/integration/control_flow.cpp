@@ -3,20 +3,7 @@
 
 using namespace test;
 
-// ---------------------------------------------------------------------------
-// Control-flow tests for Milestone 7 (if / while).
-//
-// SKIPPED for now: the language cannot yet lex or parse `if`, `while`, blocks
-// `{ }`, or assignment `x = ...`. Running them un-skipped would crash the suite
-// on a null AST node, so each carries `* doctest::skip()`.
-//
-// PROVISIONAL C-like syntax (confirm when the milestone starts). Implies three
-// sub-features: statement BLOCKS `{ }`, ASSIGNMENT (`x = expr;`), and the
-// `if`/`while` keywords + jump opcodes.
-//
-// TDD: delete `* doctest::skip()` on a test to turn it on — red, then implement
-// until green.
-// ---------------------------------------------------------------------------
+// End-to-end control flow: if / else / while, including nesting.
 
 TEST_CASE("if without else" ) {
     CHECK(evaluate("let x = 0; if (1 < 2) { x = 10; } x;") == 10);  // taken

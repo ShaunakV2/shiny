@@ -3,8 +3,8 @@
 
 using namespace test;
 
-// These tests feed hand-built bytecode straight to the VM — no lexer, parser,
-// or compiler involved — so a failure here is squarely a VM bug.
+// These feed hand-built bytecode straight to the VM — no lexer, parser, or
+// compiler involved — so a failure here is squarely a VM bug.
 
 TEST_CASE("vm: arithmetic") {
     CHECK(run({{InstructionKind::Push, 2}, {InstructionKind::Push, 3}, {InstructionKind::Add}}) == 5);
@@ -31,7 +31,6 @@ TEST_CASE("vm: comparisons produce 1 (true) or 0 (false)") {
     CHECK(run({{InstructionKind::Push, 5}, {InstructionKind::Push, 5}, {InstructionKind::Eq}}) == 1);
 }
 
-// --- Milestone 7 (control flow): jumps ---
 // Hand-built if/else-shaped bytecode. Layout (indices):
 //   0: Push <cond>
 //   1: JumpIfFalse 4      (false -> jump to the "else" at 4)
@@ -63,35 +62,4 @@ TEST_CASE("vm: Jump is unconditional (skips an instruction)") {
     CHECK(run({{InstructionKind::Push, 5},
                {InstructionKind::Jump, 3},
                {InstructionKind::Push, 999}}) == 5);
-}
-
-// --- ESP32 Step 1 (native calls): CallNative dials a registered C++ function ---
-// On the device these natives will be digitalWrite/delay; here we register mock
-// functions so we can prove the mechanism entirely on the host. A native reads
-// its args from the stack (pop) and leaves its result on the stack (push), just
-// like a built-in opcode.
-
-TEST_CASE("vm: CallNative invokes the registered function, passing args via the stack") {
-    VM vm;
-    // Native id 7: pop one arg, push arg * 10.
-    vm.registerNative(7, [](std::stack<int>& s) {
-        int arg = s.top(); s.pop();
-        s.push(arg * 10);
-    });
-    // Push 4, then CallNative 7  ->  40 left on the stack.
-    CHECK(vm.run({{InstructionKind::Push, 4},
-                  {InstructionKind::CallNative, 7}}) == 40);
-}
-
-TEST_CASE("vm: CallNative reaches the exact native named by its id, and records its arg") {
-    VM vm;
-    int seen = -1;   // what the native was actually called with
-    vm.registerNative(0, [&](std::stack<int>&) { seen = 100; });  // decoy
-    vm.registerNative(1, [&](std::stack<int>& s) {                // the one we dial
-        seen = s.top(); s.pop();
-    });
-    // CallNative 1 must run native 1 (not 0) and see the pushed arg 42.
-    vm.run({{InstructionKind::Push, 42},
-            {InstructionKind::CallNative, 1}});
-    CHECK(seen == 42);
 }

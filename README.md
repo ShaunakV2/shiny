@@ -38,8 +38,12 @@ Source code
   jump instructions over a runtime program counter. (The language is
   Turing-complete.)
 - **Output** — a `print` statement.
+- **Error reporting** — the lexer, parser, and semantic checker report malformed
+  input as diagnostics with a source `line:column` and a caret under the offending
+  token, rather than crashing or failing silently.
 - **Semantic analysis** — a compile-time **symbol table** resolves each variable
-  name to a numbered storage slot, so no variable names survive into the runtime.
+  name to a numbered storage slot (and rejects undeclared or redeclared
+  variables), so no variable names survive into the runtime.
 - **Custom bytecode + stack VM** — a compact instruction set (`Push`, `Add`,
   `Sub`, `Mul`, `Div`, `Neg`, `Load`, `Store`, the six comparisons, `Jump`,
   `JumpIfFalse`, `Print`, `CallNative`) executed against a value stack and
@@ -82,10 +86,11 @@ and evaluates to `11`.
 - [x] Control flow (`if` / `else` / `while`) — jumps and a program counter
 - [x] `print` / output statements
 - [x] Bytecode serialization (program ⇄ bytes)
+- [x] Error handling & diagnostics (lexer, parser, semantic) with source locations
 - [ ] Logical operators (`&& || !`) with short-circuit evaluation
 - [ ] Functions (parameters, return values, a call stack)
 - [ ] Call-expression syntax (so native/hardware calls can be written in-language)
-- [ ] Parser error handling & diagnostics
+- [ ] Runtime error handling in the VM (division by zero, stack checks)
 - [ ] Optimization passes and internal refactors (visitor-based AST dispatch,
       jump-table VM dispatch)
 - [ ] _(stretch)_ a static type system
@@ -104,6 +109,11 @@ and evaluates to `11`.
 - **Control flow via jumps** — `if`/`while` compile to `Jump` / `JumpIfFalse`
   against a mutable program counter, with forward jumps *backpatched* once their
   target is known. No control-flow constructs exist at the bytecode level.
+- **Diagnostics from a single source of truth** — every token carries a byte
+  offset; the parser threads it onto AST nodes; every stage throws one
+  `CompileError` type carrying that offset and a message. A single reporter turns
+  the offset into `line:column` and a caret at display time — locations are stored
+  cheaply once and formatted only when an error is actually shown.
 - **Clean stage boundaries** — the compiler and VM communicate through *only* the
   bytecode. The compiler never touches runtime storage; the VM never sees a
   variable name. (This boundary is also what lets the VM run on a microcontroller
@@ -147,7 +157,9 @@ cmake --build build --target tests
 ctest --test-dir build
 ```
 
-Run one stage with a filter, e.g. `./build/tests --test-case="vm:*"`.
+Run one stage with a filter, e.g. `./build/tests --test-case="vm:*"`. Within each
+stage, positive tests live in feature files (`expressions`, `variables`,
+`control_flow`, …) and error tests in that stage's `errors.cpp`.
 
 ## Project structure
 
@@ -159,12 +171,14 @@ src/
 ├── bytecode/    instruction set + (de)serialization
 ├── compiler/    AST → bytecode, with the symbol table
 ├── vm/          stack-based bytecode interpreter
+├── error/       CompileError type + diagnostic reporter (line:col + caret)
 └── main.cpp     CLI driver
 tests/
 ├── doctest.h        vendored test framework
 ├── test_main.cpp    test-runner entry point
 ├── support/         per-stage + end-to-end test helpers
-├── unit/            lexer / parser / compiler / vm / serialize tests
+├── unit/            per-stage folders (lexer/ parser/ compiler/ vm/),
+│                    feature files + an errors.cpp each; serialize & reporter
 └── integration/     end-to-end evaluation & control-flow tests
 firmware/            embeds the VM on an ESP32 (separate project — see its README)
 ```
