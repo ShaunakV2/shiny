@@ -88,3 +88,12 @@ TEST_CASE("compiler: a declared variable still compiles fine") {
     CHECK(bytecodeToString("let x = 5; x = 10; x;") ==
           "Push(5) Store(0) Push(10) Store(0) Load(0)");
 }
+
+TEST_CASE("compiler: redeclaring a variable is a reported error") {
+    CHECK_THROWS_AS(compile("let x = 1; let x = 2;"), CompileError);
+}
+
+TEST_CASE("compiler: reassigning (not redeclaring) a variable is fine") {
+    // 'x = 2' is an assignment, not a second 'let' — no error, reuses slot 0.
+    CHECK(bytecodeToString("let x = 1; x = 2;") == "Push(1) Store(0) Push(2) Store(0)");
+}

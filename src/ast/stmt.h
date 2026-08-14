@@ -17,13 +17,14 @@ struct Stmt {
 struct LetStatement:Stmt {
     std::unique_ptr<Expr> value;
     std::string name;
+    std::size_t offset;
     void print(std::ostream &os) const override {
         os << "(let " << name << " = ";
         value->print(os);
         os << ")";
     }
-    explicit LetStatement(std::unique_ptr<Expr> v, std::string n)
-    : value(std::move(v)), name(std::move(n)) {}
+    explicit LetStatement(std::unique_ptr<Expr> v, std::string n, std::size_t o)
+    : value(std::move(v)), name(std::move(n)), offset(o) {}
 };
 
 struct AssignStatement:Stmt {

@@ -21,6 +21,10 @@ void Compiler::compileStmt(const Stmt &line) {
     if (auto* lt = dynamic_cast<const LetStatement*>(&line)) {
         compileExpr(*lt->value);
         const int idx = std::ssize(symbols_);
+        auto it = symbols_.find(lt->name);
+        if (it != symbols_.end()) {
+            throw CompileError(std::format("variable '{}' is already declared", lt->name),lt->offset);
+        }
         symbols_[lt->name] = idx;
         code_.push_back(Instruction(InstructionKind::Store, idx));
     }

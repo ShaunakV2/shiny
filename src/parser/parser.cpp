@@ -47,11 +47,13 @@ std::unique_ptr<Stmt> Parser::parseLetStatement() {
     // Consume the 'Let' Token
     advance();
     // The next token has to be the identifier, so we use expect to make sure we get that.
-    const std::string identifier =expect(TokenKind::Identifier,"after 'let'").name;
+    const Token& idTok = expect(TokenKind::Identifier, "after 'let'");
+    const std::string identifier = idTok.name;
+    const std::size_t offset = idTok.offset;
     expect(TokenKind::Assign, std::format("after '{}'", identifier)); // expect assign
     auto initializer =  parseExpression();
     expect(TokenKind::Semicolon, std::format("after declaration of '{}'", identifier)); // finally expect semicolon
-    return std::make_unique<LetStatement>(std::move(initializer), identifier);
+    return std::make_unique<LetStatement>(std::move(initializer), identifier, offset);
 }
 
 std::unique_ptr<Stmt> Parser::parseAssignStatement() {
