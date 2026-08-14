@@ -29,6 +29,7 @@ struct LetStatement:Stmt {
 struct AssignStatement:Stmt {
     std::unique_ptr<Expr> value;
     std::string name;
+    std::size_t offset;
     void print(std::ostream &os) const override {
         os << "(assign " << name << " = ";
         value->print(os);
