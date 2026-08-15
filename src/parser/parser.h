@@ -61,6 +61,7 @@ private:
     std::unique_ptr<Stmt> parseIfStatement();
     std::unique_ptr<Stmt> parseWhileStatement();
     std::unique_ptr<Stmt> parsePrintStatement();
+    std::unique_ptr<Stmt> parseReturnStatement();
 };
 
 #endif //COMPILER_PARSER_H

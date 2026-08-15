@@ -93,6 +93,9 @@ std::unique_ptr<Stmt> Parser::parseStatement() {
     if (check(TokenKind::Identifier) && peekNext().kind == TokenKind::Assign) {
         return parseAssignStatement();
     }
+    if (check(TokenKind::Return)) {
+        return parseReturnStatement();
+    }
     return parseExprStatement();
 }
 
@@ -131,6 +134,13 @@ std::unique_ptr<Stmt> Parser::parsePrintStatement() {
     std::unique_ptr<Expr> value = parseExpression();
     expect(TokenKind::Semicolon, "after print statement");
     return std::make_unique<PrintStatement>(std::move(value));
+}
+
+std::unique_ptr<Stmt> Parser::parseReturnStatement() {
+    advance(); // consume return
+    std::unique_ptr<Expr> value = parseExpression();
+    expect(TokenKind::Semicolon, "after return statement");
+    return std::make_unique<ReturnStatement>(std::move(value));
 }
 
 std::unique_ptr<Stmt> Parser::parseBlock() {
