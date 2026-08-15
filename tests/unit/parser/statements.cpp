@@ -36,3 +36,16 @@ TEST_CASE("parser: while loop" ) {
 TEST_CASE("parser: print statement") {
     CHECK(astToString("print x + 1;") == "(print (+ x 1))");
 }
+
+// return / function declarations — red until parseStatement dispatches Return / Fn.
+TEST_CASE("parser: return statement") {
+    CHECK(astToString("return 5;") == "(return 5)");
+    CHECK(astToString("return a + b;") == "(return (+ a b))");
+}
+
+TEST_CASE("parser: function declaration") {
+    CHECK(astToString("fn add(a, b) { return a + b; }") ==
+          "(fn add (a b) (block (return (+ a b))))");
+    CHECK(astToString("fn go() { print 1; }") ==
+          "(fn go () (block (print 1)))");
+}

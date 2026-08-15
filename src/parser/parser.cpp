@@ -6,6 +6,7 @@
 
 #include <format>
 #include <iostream>
+#include <list>
 
 #include "error/error.h"
 
@@ -194,22 +195,32 @@ std::unique_ptr<Expr> Parser::parseFactor()  {
         int v  = tok.value.value();
         return std::make_unique<IntegerLiteral>(v);
     }
-    else if (check(TokenKind::LParen)) {
+     if (check(TokenKind::LParen)) {
         const Token& tok = advance();
         auto inner = parseExpression();
         expect(TokenKind::RParen, "to close '('");
         return inner;
     }
-    else if (check(TokenKind::Identifier)) {
+     if (check(TokenKind::Identifier)) {
         const std::size_t offset = peek().offset;
         const std::string name = advance().name;
+         if (check(TokenKind::LParen)) {
+             std::vector<std::unique_ptr<Expr>> args;
+             advance(); // Consume LParen
+             while (!check(TokenKind::RParen)) {
+                args.push_back( parseExpression());
+                 if (check(TokenKind::Comma)) {
+                     advance();
+                 }
+             }
+             advance(); // Consume )
+             return std::make_unique<CallExpr>(name,std::move(args), offset);
+         }
         return std::make_unique<VariableExpr>(name, offset);
     }
-    else {
-        throw CompileError(
-            std::format("expected an expression, found {}", tokenKindName(peek().kind)),
-            peek().offset);
-    }
+    throw CompileError(
+    std::format("expected an expression, found {}", tokenKindName(peek().kind)),peek().offset);
+
 
 }
 

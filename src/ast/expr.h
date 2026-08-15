@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <ostream>
+#include <vector>
 
 #include "../lexer/token.h"
 
@@ -59,5 +60,21 @@ struct VariableExpr : Expr {
     std::size_t offset;
     explicit VariableExpr(std::string n, std::size_t o) : name(std::move(n)), offset(o) {}
     void print(std::ostream& os) const override { os << name; }
+};
+
+struct CallExpr : Expr {
+    std::string callee;
+    std::vector<std::unique_ptr<Expr>> args;
+    std::size_t offset;
+    CallExpr(std::string callee, std::vector<std::unique_ptr<Expr>> args, std::size_t offset)
+        : callee(std::move(callee)), args(std::move(args)), offset(offset) {}
+    void print(std::ostream& os) const override {
+        os << "(call " << callee;
+        for (const std::unique_ptr<Expr>& arg : args) {
+            os << " ";
+            arg->print(os);
+        }
+        os << ")";
+    }
 };
 #endif // COMPILER_EXPR_H

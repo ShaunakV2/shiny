@@ -103,4 +103,33 @@ struct PrintStatement:Stmt {
     explicit PrintStatement(std::unique_ptr<Expr> v): value(std::move(v)){}
 };
 
+struct ReturnStatement:Stmt {
+    std::unique_ptr<Expr> value;
+    void print(std::ostream& os) const override {
+        os << "(return ";
+        value->print(os);
+        os << ")";
+    }
+    explicit ReturnStatement(std::unique_ptr<Expr> v): value(std::move(v)){}
+};
+
+// `fn name(params) { body }` — a named function definition. `body` is a block.
+struct FunctionDeclaration:Stmt {
+    std::string name;
+    std::vector<std::string> params;
+    std::unique_ptr<Stmt> body;
+    void print(std::ostream& os) const override {
+        os << "(fn " << name << " (";
+        for (std::size_t i = 0; i < params.size(); ++i) {
+            if (i) os << " ";
+            os << params[i];
+        }
+        os << ") ";
+        body->print(os);
+        os << ")";
+    }
+    FunctionDeclaration(std::string n, std::vector<std::string> p, std::unique_ptr<Stmt> b)
+        : name(std::move(n)), params(std::move(p)), body(std::move(b)) {}
+};
+
 #endif //COMPILER_STMT_H
