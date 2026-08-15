@@ -43,3 +43,9 @@ TEST_CASE("lexer: while / braces" ) {
 TEST_CASE("lexer: print keyword") {
     CHECK(tokensToString("print x;") == "Print Identifier(x) Semicolon EndOfFile");
 }
+
+TEST_CASE("lexer: function keywords and comma") {
+    CHECK(tokensToString("fn add(a, b) { return a + b; }") ==
+          "Fn Identifier(add) LParen Identifier(a) Comma Identifier(b) RParen "
+          "LBrace Return Identifier(a) Plus Identifier(b) Semicolon RBrace EndOfFile");
+}

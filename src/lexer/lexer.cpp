@@ -62,6 +62,8 @@ Token Lexer::readIdentifier() {
         {"else",  TokenKind::Else},
         {"while", TokenKind::While},
         {"print", TokenKind::Print},
+        {"fn",     TokenKind::Fn},
+        {"return", TokenKind::Return},
     };
 
     if (auto it = keywords.find(val); it != keywords.end()) {
@@ -90,6 +92,7 @@ Token Lexer::scanToken() {
         case '{': advance(); return Token{TokenKind::LBrace,    std::nullopt};
         case '}': advance(); return Token{TokenKind::RBrace,    std::nullopt};
         case ';': advance(); return Token{TokenKind::Semicolon, std::nullopt};
+        case ',': advance(); return Token{TokenKind::Comma,     std::nullopt};
 
         // Multi-character operators: consume the first char, then peek for a trailing '='.
         case '<':

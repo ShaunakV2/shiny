@@ -33,6 +33,9 @@ enum class TokenKind {
     GreaterEqual,
     LessEqual,
     BangEqual,
+    Fn,
+    Return,
+    Comma,
     Unknown,
 };
 
@@ -64,6 +67,9 @@ inline std::string tokenKindName(TokenKind kind) {
         case TokenKind::GreaterEqual: return "GreaterEqual";
         case TokenKind::LessEqual:   return "LessEqual";
         case TokenKind::BangEqual:   return "BangEqual";
+        case TokenKind::Fn:          return "Fn";
+        case TokenKind::Return:      return "Return";
+        case TokenKind::Comma:       return "Comma";
         case TokenKind::Unknown:    return "Unknown";
     }
     return "Unknown";
@@ -82,6 +88,7 @@ inline const char* tokenKindSymbol(TokenKind kind) {
         case TokenKind::RParen:    return ")";
         case TokenKind::LBrace:    return "{";
         case TokenKind::RBrace:    return "}";
+        case TokenKind::Comma:     return ",";
         case TokenKind::EqualEqual: return "==";
         case TokenKind::Greater:    return ">";
         case TokenKind::Less:       return "<";
