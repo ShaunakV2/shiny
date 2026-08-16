@@ -9,6 +9,7 @@
 #include <list>
 
 #include "error/error.h"
+#include "error/error.h"
 
 Parser::Parser(std::vector<Token> tokens) : tokens_(std::move(tokens)){};
 
@@ -90,6 +91,9 @@ std::unique_ptr<Stmt> Parser::parseStatement() {
     if (check(TokenKind::Print)) {
         return parsePrintStatement();
     }
+    if (check(TokenKind::Fn)) {
+        return parseFunctionDeclaration();
+    }
     if (check(TokenKind::Identifier) && peekNext().kind == TokenKind::Assign) {
         return parseAssignStatement();
     }
@@ -97,6 +101,22 @@ std::unique_ptr<Stmt> Parser::parseStatement() {
         return parseReturnStatement();
     }
     return parseExprStatement();
+}
+
+std::unique_ptr<Stmt> Parser::parseFunctionDeclaration() {
+    advance(); // consume fn
+    std::string name = expect(TokenKind::Identifier, "after function declaration").name; // Function name
+    expect(TokenKind::LParen, "expected '(' after 'Identifier'");
+    std::vector<std::string> params;
+    while (!check(TokenKind::RParen)) {
+        params.push_back(expect(TokenKind::Identifier, "as a parameter name").name);
+        if (check(TokenKind::Comma)) {
+            advance();
+        }
+    }
+    expect(TokenKind::RParen, "expected ')' after 'Identifier'");
+    std::unique_ptr<Stmt> body = parseBlock();
+    return std::make_unique<FunctionDeclaration>(name, params, std::move(body));
 }
 
 std::unique_ptr<Stmt> Parser::parseIfStatement() {
