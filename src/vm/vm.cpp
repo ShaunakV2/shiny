@@ -8,6 +8,7 @@
 
 int VM::run(const std::vector<Instruction> &code) {
     size_t pc = 0;
+    frames_.push_back(Frame{}); // main frame
     while (pc<code.size()) {
         const Instruction& instr = code[pc];
         pc++;
@@ -93,14 +94,14 @@ int VM::run(const std::vector<Instruction> &code) {
             const int val = stack_.top();
             stack_.pop();
             const int slot = instr.value.value();
-            if (slot >= static_cast<int>(slots_.size())) {
-                slots_.resize(slot + 1);
+            if (slot >= static_cast<int>(frames_.back().slots.size())) {
+                frames_.back().slots.resize(slot + 1);
             }
-            slots_[slot] = val;
+            frames_.back().slots[slot] = val;
 
         }
         else if (instr.kind == InstructionKind::Load) {
-            int val = slots_[instr.value.value()];
+            int val = frames_.back().slots[instr.value.value()];
             stack_.push(val);
         }
         else if (instr.kind == InstructionKind::Jump) {
