@@ -7,6 +7,8 @@
 #include <stack>
 #include <vector>
 #include <functional>
+
+#include "frame.h"
 #include "../bytecode/instruction.h"
 
 class VM {
@@ -20,6 +22,7 @@ public:
 private:
     std::stack<int> stack_;
     std::vector<int> slots_;             // slots for variable storage.
+    std::vector<Frame> frames_;
     std::vector<NativeFn> natives_;      // indexed by id
 };
 

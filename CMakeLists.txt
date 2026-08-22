@@ -22,6 +22,7 @@ add_library(compiler_core
         src/error/reporter.h
         src/compiler/compiler.h
         src/vm/vm.h
+        src/vm/frame.h
 )
 # PUBLIC so anything linking compiler_core (the CLI, the tests) can #include "lexer/..."
 target_include_directories(compiler_core PUBLIC ${CMAKE_SOURCE_DIR}/src)
