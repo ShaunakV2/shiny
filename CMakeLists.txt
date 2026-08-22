@@ -46,6 +46,7 @@ add_executable(tests
         tests/unit/compiler/errors.cpp
         tests/unit/vm/execution.cpp
         tests/unit/vm/natives.cpp
+        tests/unit/vm/calls.cpp
         tests/unit/serialize.cpp
         tests/unit/reporter.cpp
         tests/integration/evaluation.cpp

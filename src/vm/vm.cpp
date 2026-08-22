@@ -120,6 +120,17 @@ int VM::run(const std::vector<Instruction> &code) {
         else if (instr.kind == InstructionKind::CallNative) {
             natives_[instr.value.value()](stack_);   // look up by id, hand it the stack
         }
+        else if (instr.kind == InstructionKind::Call) {
+            frames_.push_back(Frame{pc, {}});
+            pc = instr.value.value();
+        }
+        else if (instr.kind == InstructionKind::Return) {
+            int retval = stack_.top();
+            stack_.pop();
+            pc = frames_.back().returnAddr;
+            frames_.pop_back();
+            stack_.push(retval);
+        }
     }
     return stack_.empty() ? 0 : stack_.top();
 };
